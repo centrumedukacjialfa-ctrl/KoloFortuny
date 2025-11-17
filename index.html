@@ -28,9 +28,23 @@
 
 <!-- PANEL MISJI -->
 <div id="missionPanel" class="hidden">
-    <h2>🗺 Misja <span id="missionNumber">1</span> z 6</h2>
-    <div id="missionStars"></div>
+    <h2>🗺 Misja <span id="missionNumber">1</span></h2>
     <button onclick="startMission()">Start misji</button>
+</div>
+
+<!-- TRYB TURNIEJOWY – konfiguracja -->
+<div id="tournamentSetup" class="hidden">
+    <h2>Tryb turniejowy</h2>
+    <p>Liczba graczy (2–10):</p>
+    <input id="playerCount" type="number" min="2" max="10" value="2">
+    <button onclick="createTournament()">Start</button>
+</div>
+
+<!-- TRYB TURNIEJOWY – rozgrywka -->
+<div id="tournamentBoard" class="hidden">
+    <h2>Turniej</h2>
+    <div id="turnInfo"></div>
+    <div id="playerScores"></div>
 </div>
 
 <!-- LICZNIK CZASU -->
@@ -54,8 +68,6 @@
     <input type="text" id="answerInput">
     <button id="checkBtn">Sprawdź</button>
 </div>
-
-<div id="result"></div>
 
 <!-- TABLICA WYNIKÓW -->
 <div id="scoreBoard">
