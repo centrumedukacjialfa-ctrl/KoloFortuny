@@ -2,83 +2,28 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Matematyczne Koło Fortuny – Pełna Gra</title>
+    <title>Matematyczne Koło Fortuny</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- DŹWIĘKI (MUSZĄ BYĆ W BODY!) -->
-<audio id="sndSpin" src="spin.wav"></audio>
-<audio id="sndCorrect" src="correct.wav"></audio>
-<audio id="sndWrong" src="wrong.wav"></audio>
-<audio id="sndBeep" src="beep.wav"></audio>
-<audio id="sndAlarm" src="alarm.wav"></audio>
-
-<!-- PANEL STATYSTYK -->
-<div id="statsPanel" class="hidden">
-    <h2>📊 Statystyki ucznia</h2>
-
-    <div class="statItem">
-        <span class="statIcon">⭐</span>
-        <span class="statLabel">Ukończone misje:</span>
-        <span id="statMissions">0</span>
-    </div>
-
-    <div class="statItem">
-        <span class="statIcon">🏆</span>
-        <span class="statLabel">Rekord punktów:</span>
-        <span id="statBestScore">0</span>
-    </div>
-
-    <div class="statItem">
-        <span class="statIcon">🔥</span>
-        <span class="statLabel">Najdłuższa seria:</span>
-        <span id="statBestStreak">0</span>
-    </div>
-
-    <div class="statItem">
-        <span class="statIcon">✔</span>
-        <span class="statLabel">Poprawne odpowiedzi:</span>
-        <span id="statCorrect">0</span>
-    </div>
-
-    <div class="statItem">
-        <span class="statIcon">❌</span>
-        <span class="statLabel">Błędne odpowiedzi:</span>
-        <span id="statWrong">0</span>
-    </div>
-
-    <button id="resetStatsBtn" onclick="resetStats()">🔄 Resetuj statystyki</button>
-</div>
-
 <h1>🎡 Matematyczne Koło Fortuny</h1>
+
+<!-- PANEL ŻYĆ -->
+<div id="lifePanel" class="hidden">
+    ❤️ <span id="livesCount">3</span>
+</div>
 
 <!-- PANEL TRYBÓW GRY -->
 <div id="modePanel">
     <h2>Wybierz tryb gry</h2>
 
-    <button class="modeBtn" onclick="startMissionMode()">⭕ Misje (6 poziomów)</button>
-    <button class="modeBtn" onclick="startTimeMode()">⏱ Tryb czasowy (10s)</button>
-    <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej (2–10 graczy)</button>
+    <button class="modeBtn" onclick="startMissionMode()">⭕ Misje</button>
+    <button class="modeBtn" onclick="startTimeMode()">⏱ Tryb czasowy</button>
+    <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej</button>
     <button class="modeBtn" onclick="startPointsMode()">⭐ Gra do X punktów</button>
     <button class="modeBtn" onclick="startEndlessMode()">♾ Tryb nieskończony</button>
-</div>
-
-<!-- PANEL USTAWIEŃ TRYBU TURNIEJU -->
-<div id="tournamentSetup" class="hidden">
-    <h2>Tryb turniejowy</h2>
-    <label>Liczba graczy (2–10):</label>
-    <input type="number" id="tournamentPlayers" min="2" max="10" value="2">
-    <button onclick="beginTournament()">Start turnieju</button>
-</div>
-
-<!-- PANEL USTAWIEŃ TRYBU DO PUNKTÓW -->
-<div id="pointsSetup" class="hidden">
-    <h2>Cel gry</h2>
-    <label>Gra do ilu punktów?</label>
-    <input type="number" id="pointsGoal" min="5" max="200" value="20">
-    <button onclick="beginPointsGame()">Rozpocznij grę</button>
 </div>
 
 <!-- PANEL MISJI -->
@@ -88,7 +33,7 @@
     <button onclick="startMission()">Start misji</button>
 </div>
 
-<!-- LICZNIK CZASU W TRYBIE CZASOWYM -->
+<!-- LICZNIK CZASU -->
 <div id="timer" class="hidden">
     ⏱ <span id="timeLeft">10</span> s
 </div>
@@ -112,13 +57,7 @@
 
 <div id="result"></div>
 
-<!-- TURNIEJ: TABLICA GRACZY -->
-<div id="tournamentTable" class="hidden">
-    <h2>Wyniki turnieju</h2>
-    <div id="tournamentList"></div>
-</div>
-
-<!-- NORMALNA TABLICA WYNIKÓW -->
+<!-- TABLICA WYNIKÓW -->
 <div id="scoreBoard" class="hidden">
     <h2>Wyniki</h2>
     <p>Gracz 1: <span id="p1">0</span></p>
