@@ -1,35 +1,68 @@
-// =========================
-// KOŁO 8 SEGMENTÓW
-// =========================
+//// ==== POCZĄTEK SEGMENTU 1 ====
+
+// ===========================================
+// GLOBALNE ZMIENNE I STRUKTURA GRY
+// ===========================================
+
+let gameMode = null;       
+// "mission", "time", "tournament", "points", "endless"
+
+let currentMission = 1;
+let missionProgress = 0;
+let missionTasksNeeded = 0;
+
+let timerInterval = null;
+let timeLeft = 10;
+
+let tournamentPlayers = 0;
+let tournamentScores = [];
+let tournamentTurn = 0;
+
+let pointsGoal = 0;
+let endlessDifficulty = 1;
+
+let chosenSegment = null;
+let correctAnswer = null;
+
+// Wybrane typy zadań w grze:
+const dotColors = ["🔵", "🟢", "🟡", "🔴"];
+
+// ===========================================
+// RYSOWANIE KOŁA
+// ===========================================
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-
-const spinBtn = document.getElementById("spinBtn");
-const answerSection = document.getElementById("answerSection");
-const answerInput = document.getElementById("answerInput");
 
 let angle = 0;
 let spinning = false;
 
 const segments = [
-    { color: "blue", points: 1 },
-    { color: "green", points: 2 },
+    { color: "blue",   points: 1 },
+    { color: "green",  points: 2 },
     { color: "yellow", points: 3 },
-    { color: "red", points: 5 },
-    { color: "blue", points: 1 },
-    { color: "green", points: 2 },
+    { color: "red",    points: 5 },
+    { color: "blue",   points: 1 },
+    { color: "green",  points: 2 },
     { color: "yellow", points: 3 },
-    { color: "red", points: 5 }
+    { color: "red",    points: 5 }
 ];
 
 const segmentAngle = (2 * Math.PI) / 8;
 
+// Rysowanie koła
 function drawWheel() {
+    ctx.clearRect(0, 0, 500, 500);
+
     for (let i = 0; i < segments.length; i++) {
         ctx.beginPath();
         ctx.moveTo(250, 250);
-        ctx.arc(250, 250, 250, i * segmentAngle, (i + 1) * segmentAngle);
+        ctx.arc(
+            250, 250,
+            250,
+            i * segmentAngle,
+            (i + 1) * segmentAngle
+        );
         ctx.fillStyle = segments[i].color;
         ctx.fill();
         ctx.strokeStyle = "black";
@@ -49,17 +82,16 @@ function drawWheel() {
 
 drawWheel();
 
-// ==============================
-// SPIN
-// ==============================
+// ===========================================
+// SPIN KOŁA
+// ===========================================
 
-spinBtn.addEventListener("click", () => {
+document.getElementById("spinBtn").addEventListener("click", () => {
     if (spinning) return;
 
     document.getElementById("taskBox").innerHTML = "";
     document.getElementById("result").innerHTML = "";
-    answerSection.style.display = "none";
-    answerInput.value = "";
+    document.getElementById("answerSection").classList.add("hidden");
 
     spinning = true;
 
@@ -88,49 +120,66 @@ function drawRotated() {
     ctx.translate(250, 250);
     ctx.rotate(angle);
     ctx.translate(-250, -250);
-    ctx.clearRect(0, 0, 500, 500);
     drawWheel();
     ctx.restore();
 }
 
-let chosenSegment = null;
-
 function finishSpin() {
-    const normalizedAngle = (angle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    const index = segments.length - 1 - Math.floor(normalizedAngle / segmentAngle);
+    const normalizedAngle =
+        (angle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+    const index =
+        segments.length -
+        1 -
+        Math.floor(normalizedAngle / segmentAngle);
+
     chosenSegment = segments[index];
 
     document.getElementById("taskBox").innerHTML =
         "<b>Kliknij koło, aby zobaczyć zadanie!</b>";
 }
 
+// po kliknięciu w koło — zadanie
 canvas.addEventListener("click", () => {
     if (!chosenSegment) return;
     showTask();
 });
 
-// ==============================
-// GENEROWANIE ZADAŃ
-// ==============================
+// ===========================================
+// GENERATORY LICZB / KROPEK
+// ===========================================
 
-let correctAnswer = "";
-let expectedSymbol = "";
-let expectedMissing = null;
-
-function randomNum() {
-    return Math.floor(Math.random() * 10) + 1;
+function rand(n = 10) {
+    return Math.floor(Math.random() * n) + 1;
 }
-
-const dotColors = ["🔵", "🟢", "🟡", "🔴"];
 
 function makeDots(n) {
     let s = "";
-    for (let i = 0; i < n; i++) s += dotColors[Math.floor(Math.random() * 4)];
+    for (let i = 0; i < n; i++)
+        s += dotColors[Math.floor(Math.random() * dotColors.length)];
     return s;
 }
 
+// ===========================================
+// GENERATORY ZADAŃ
+// ===========================================
+
+function generateClassic() {
+    const a = rand(), b = rand();
+    const add = Math.random() < 0.5;
+    correctAnswer = add ? a + b : a - b;
+    return `${a} ${add ? "+" : "-"} ${b} = ?`;
+}
+
+function generateDots() {
+    const a = rand(), b = rand();
+    const add = Math.random() < 0.5;
+    correctAnswer = add ? a + b : a - b;
+    return `${makeDots(a)} ${add ? "+" : "-"} ${makeDots(b)} = ?`;
+}
+
 function generateStory() {
-    const a = randomNum(), b = randomNum();
+    const a = rand(), b = rand();
     const add = Math.random() < 0.5;
 
     if (add) {
@@ -145,95 +194,389 @@ function generateStory() {
 }
 
 function generateMissing() {
-    const a = randomNum(), b = randomNum();
+    const a = rand(), b = rand();
     const res = a + b;
     correctAnswer = a;
-
     return `__ + ${b} = ${res}`;
 }
 
 function generateCompare() {
-    const a = randomNum(), b = randomNum();
+    const a = rand(), b = rand();
     correctAnswer = a === b ? "=" : a > b ? ">" : "<";
     return `${a} ? ${b}`;
 }
 
-function showTask() {
-    const style = document.getElementById("taskStyleSelect").value;
+// Typy zadań dla "mixu"
+const allTypes = ["classic", "dots", "story", "missing", "compare"];
 
-    answerSection.style.display = "block";
+//// ==== KONIEC SEGMENTU 1 ====
+//// ==== POCZĄTEK SEGMENTU 2 ====
 
-    let task = "";
-    if (style === "mix") {
-        const types = ["classic", "dots", "story", "missing", "compare"];
-        return showTaskOfType(types[Math.floor(Math.random() * 5)]);
-    } else {
-        return showTaskOfType(style);
+// ===========================================
+// START TRYBÓW GRY
+// ===========================================
+
+function startMissionMode() {
+    gameMode = "mission";
+    document.getElementById("modePanel").classList.add("hidden");
+    document.getElementById("missionPanel").classList.remove("hidden");
+
+    currentMission = 1;
+    missionProgress = 0;
+    updateMissionStars();
+}
+
+function startTimeMode() {
+    gameMode = "time";
+    document.getElementById("modePanel").classList.add("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("timer").classList.remove("hidden");
+}
+
+function startPointsMode() {
+    gameMode = "points";
+    document.getElementById("modePanel").classList.add("hidden");
+    document.getElementById("pointsSetup").classList.remove("hidden");
+}
+
+function startEndlessMode() {
+    gameMode = "endless";
+    endlessDifficulty = 1;
+
+    document.getElementById("modePanel").classList.add("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+}
+
+
+// ===========================================
+// TRYB DO X PUNKTÓW
+// ===========================================
+
+function beginPointsGame() {
+    pointsGoal = Number(document.getElementById("pointsGoal").value);
+
+    document.getElementById("pointsSetup").classList.add("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("scoreBoard").classList.remove("hidden");
+}
+
+
+// ===========================================
+// MISJE (6 poziomów)
+// ===========================================
+
+// Każda misja ma inną ilość zadań i trudność
+const missionConfig = {
+    1: { tasks: 5, type: "classic", range: 5 },
+    2: { tasks: 5, type: "classic", range: 10 },
+    3: { tasks: 6, type: "story",   range: 10 },
+    4: { tasks: 5, type: "dots",    range: 10 },
+    5: { tasks: 8, type: "mix",     range: 20 },
+    6: { tasks: 10, type: "mix",    range: 50 }
+};
+
+function updateMissionStars() {
+    let stars = "";
+    const total = 6;
+
+    for (let i = 1; i <= total; i++) {
+        stars += i <= currentMission ? "⭐ " : "☆ ";
+    }
+
+    document.getElementById("missionStars").innerHTML = stars;
+    document.getElementById("missionNumber").innerText = currentMission;
+}
+
+function startMission() {
+    document.getElementById("missionPanel").classList.add("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+
+    missionProgress = 0;
+    missionTasksNeeded = missionConfig[currentMission].tasks;
+}
+
+function nextMission() {
+    currentMission++;
+
+    if (currentMission > 6) {
+        alert("🎉 Ukończyłeś wszystkie misje! Brawo!");
+        location.reload();
+        return;
+    }
+
+    updateMissionStars();
+    document.getElementById("missionPanel").classList.remove("hidden");
+}
+
+
+// ===========================================
+// TRYB CZASOWY (10 sekund)
+// ===========================================
+
+function startTimer() {
+    timeLeft = 10;
+    document.getElementById("timeLeft").innerText = timeLeft;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timeLeft").innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            blockAnswerTimeOut();
+        }
+    }, 1000);
+}
+
+function blockAnswerTimeOut() {
+    document.getElementById("result").style.color = "red";
+    document.getElementById("result").innerHTML =
+        "⏱ Czas minął! 0 punktów.";
+
+    document.getElementById("answerSection").classList.add("hidden");
+    chosenSegment = null;
+}
+
+
+// ===========================================
+// TRYB NIESKOŃCZONY (rośnie trudność)
+// ===========================================
+
+function generateEndlessTask() {
+    let t = allTypes[Math.floor(Math.random() * allTypes.length)];
+
+    // zwiększamy trudność: liczby rosną
+    let max = 10 + endlessDifficulty * 5;
+    if (max > 50) max = 50;
+
+    function r() { return Math.floor(Math.random() * max) + 1; }
+
+    if (t === "classic") {
+        const a = r(), b = r();
+        const add = Math.random() < 0.5;
+        correctAnswer = add ? a + b : a - b;
+        return `${a} ${add ? "+" : "-"} ${b} = ?`;
+
+    } else if (t === "dots") {
+        const a = r(), b = r();
+        const add = Math.random() < 0.5;
+        correctAnswer = add ? a + b : a - b;
+        return `${makeDots(a)} ${add ? "+" : "-"} ${makeDots(b)} = ?`;
+
+    } else if (t === "story") {
+        const a = r(), b = r();
+        const add = Math.random() < 0.5;
+
+        if (add) {
+            correctAnswer = a + b;
+            return `Kuba miał ${a} klocków. Mama dała mu ${b}. Ile ma teraz razem?`;
+        } else {
+            const big = Math.max(a, b);
+            const small = Math.min(a, b);
+            correctAnswer = big - small;
+            return `Ala miała ${big} cukierki. Dała koledze ${small}. Ile jej zostało?`;
+        }
+
+    } else if (t === "missing") {
+        const a = r(), b = r();
+        const res = a + b;
+        correctAnswer = a;
+        return `__ + ${b} = ${res}`;
+
+    } else if (t === "compare") {
+        const a = r(), b = r();
+        correctAnswer = a === b ? "=" : a > b ? ">" : "<";
+        return `${a} ? ${b}`;
     }
 }
 
-function showTaskOfType(type) {
+//// ==== KONIEC SEGMENTU 2 ====
+//// ==== POCZĄTEK SEGMENTU 3 ====
+
+// ===========================================
+// TRYB TURNIEJOWY (2–10 GRACZY)
+// ===========================================
+
+function startTournamentMode() {
+    gameMode = "tournament";
+
+    document.getElementById("modePanel").classList.add("hidden");
+    document.getElementById("tournamentSetup").classList.remove("hidden");
+}
+
+function beginTournament() {
+    tournamentPlayers = Number(document.getElementById("tournamentPlayers").value);
+
+    tournamentScores = Array(tournamentPlayers).fill(0);
+    tournamentTurn = 0;
+
+    document.getElementById("tournamentSetup").classList.add("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("tournamentTable").classList.remove("hidden");
+
+    updateTournamentTable();
+}
+
+function updateTournamentTable() {
+    let html = "";
+
+    for (let i = 0; i < tournamentPlayers; i++) {
+        const turnMark = i === tournamentTurn ? "➡ " : "";
+        html += `<p>${turnMark}Gracz ${i + 1}: ${tournamentScores[i]} pkt</p>`;
+    }
+
+    document.getElementById("tournamentList").innerHTML = html;
+}
+
+function nextTournamentTurn() {
+    tournamentTurn++;
+    if (tournamentTurn >= tournamentPlayers) tournamentTurn = 0;
+    updateTournamentTable();
+}
+
+// ===========================================
+// WYBÓR ZADANIA WG TRYBU
+// ===========================================
+
+function showTask() {
+    let type = "";
+
+    if (gameMode === "mission") {
+        type = missionConfig[currentMission].type;
+    } else if (gameMode === "endless") {
+        document.getElementById("taskBox").innerHTML = generateEndlessTask();
+        document.getElementById("answerSection").classList.remove("hidden");
+        return;
+    } else {
+        type = allTypes[Math.floor(Math.random() * allTypes.length)];
+    }
+
+    document.getElementById("answerSection").classList.remove("hidden");
+
     let task = "";
-
-    if (type === "classic") {
-        const a = randomNum(), b = randomNum();
-        const add = Math.random() < 0.5;
-        correctAnswer = add ? a + b : a - b;
-        task = `${a} ${add ? "+" : "-"} ${b} = ?`;
-
-    } else if (type === "dots") {
-        const a = randomNum(), b = randomNum();
-        const add = Math.random() < 0.5;
-        correctAnswer = add ? a + b : a - b;
-        task = `${makeDots(a)} ${add ? "+" : "-"} ${makeDots(b)} = ?`;
-
-    } else if (type === "story") {
-        task = generateStory();
-
-    } else if (type === "missing") {
-        task = generateMissing();
-
-    } else if (type === "compare") {
-        task = generateCompare();
+    if (type === "classic")      task = generateClassic();
+    if (type === "dots")         task = generateDots();
+    if (type === "story")        task = generateStory();
+    if (type === "missing")      task = generateMissing();
+    if (type === "compare")      task = generateCompare();
+    if (type === "mix") {
+        const t = allTypes[Math.floor(Math.random() * allTypes.length)];
+        return showTaskOfType(t);
     }
 
     document.getElementById("taskBox").innerHTML =
-        `<b>${task}</b><br><br>
-         Za to zadanie: <b>${chosenSegment.points}</b> pkt`;
+        `${task}<br><br>🎯 Za to zadanie: <b>${chosenSegment.points}</b> pkt`;
+
+    if (gameMode === "time") startTimer();
 }
 
+function showTaskOfType(type) {
+    let t = "";
 
-// ==============================
+    if (type === "classic") t = generateClassic();
+    if (type === "dots")    t = generateDots();
+    if (type === "story")   t = generateStory();
+    if (type === "missing") t = generateMissing();
+    if (type === "compare") t = generateCompare();
+
+    document.getElementById("answerSection").classList.remove("hidden");
+
+    document.getElementById("taskBox").innerHTML =
+        `${t}<br><br>🎯 Za to zadanie: <b>${chosenSegment.points}</b> pkt`;
+
+    if (gameMode === "time") startTimer();
+}
+
+// ===========================================
 // SPRAWDZANIE ODPOWIEDZI
-// ==============================
-
-let scores = { p1: 0, p2: 0 };
-let playerTurn = 1;
+// ===========================================
 
 document.getElementById("checkBtn").addEventListener("click", () => {
-    const user = answerInput.value.trim();
+    const user = document.getElementById("answerInput").value.trim();
     const resultBox = document.getElementById("result");
+
+    clearInterval(timerInterval);
 
     if (user == correctAnswer) {
         resultBox.style.color = "green";
         resultBox.innerHTML =
-            `✔ Poprawnie! Zdobywasz <b>${chosenSegment.points}</b> pkt!`;
+            `✔ Poprawnie! Zdobywasz <b>${chosenSegment.points}</b> punktów!`;
 
-        if (playerTurn === 1) scores.p1 += chosenSegment.points;
-        else scores.p2 += chosenSegment.points;
-
-        playerTurn = playerTurn === 1 ? 2 : 1;
+        applyScoreGain(chosenSegment.points);
 
     } else {
         resultBox.style.color = "red";
-        resultBox.innerHTML = `✘ Źle! Poprawna odpowiedź: <b>${correctAnswer}</b>`;
+        resultBox.innerHTML =
+            `❌ Źle! Poprawna odpowiedź to <b>${correctAnswer}</b>`;
+
+        if (gameMode === "endless") {
+            alert("Gra zakończona! Popełniłeś błąd.");
+            location.reload();
+        }
     }
 
-    updateScoreboard();
+    document.getElementById("answerSection").classList.add("hidden");
     chosenSegment = null;
+    document.getElementById("answerInput").value = "";
 });
 
-function updateScoreboard() {
-    document.getElementById("p1").innerText = scores.p1;
-    document.getElementById("p2").innerText = scores.p2;
+// ===========================================
+// PRZYDZIELANIE PUNKTÓW WG TRYBU
+// ===========================================
+
+let p1 = 0;
+let p2 = 0;
+let turn = 1;
+
+function applyScoreGain(points) {
+
+    // TRYB MISJI
+    if (gameMode === "mission") {
+        missionProgress++;
+        if (missionProgress >= missionTasksNeeded) {
+            alert("🎉 Misja ukończona!");
+            nextMission();
+        }
+        return;
+    }
+
+    // TRYB CZASOWY → nic szczególnego, tylko wynik
+    if (gameMode === "time") return;
+
+    // TRYB TURNIEJOWY
+    if (gameMode === "tournament") {
+        tournamentScores[tournamentTurn] += points;
+        updateTournamentTable();
+        nextTournamentTurn();
+        return;
+    }
+
+    // TRYB DO X PUNKTÓW
+    if (gameMode === "points") {
+        if (turn === 1) p1 += points;
+        else p2 += points;
+
+        document.getElementById("p1").innerText = p1;
+        document.getElementById("p2").innerText = p2;
+
+        if (p1 >= pointsGoal) {
+            alert("🎉 Gracz 1 wygrywa grę!");
+            location.reload();
+        }
+        if (p2 >= pointsGoal) {
+            alert("🎉 Gracz 2 wygrywa grę!");
+            location.reload();
+        }
+
+        turn = turn === 1 ? 2 : 1;
+        return;
+    }
+
+    // TRYB NIESKOŃCZONY — rośnie trudność
+    if (gameMode === "endless") {
+        endlessDifficulty++;
+        return;
+    }
 }
+
+//// ==== KONIEC SEGMENTU 3 ====
