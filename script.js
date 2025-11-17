@@ -617,3 +617,97 @@ function applyScoreGain(points) {
 }
 
 //// ==== KONIEC SEGMENTU 3 ====
+//// ==== POCZĄTEK STATYSTYK ====
+
+// STRUKTURA STATYSTYK
+let stats = {
+    missionsCompleted: 0,
+    bestScore: 0,
+    bestStreak: 0,
+    correct: 0,
+    wrong: 0
+};
+
+// ŁADOWANIE STATYSTYK Z LOCALSTORAGE
+function loadStats() {
+    const s = localStorage.getItem("mathWheelStats");
+    if (s) stats = JSON.parse(s);
+
+    // aktualizacja panelu
+    document.getElementById("statMissions").innerText = stats.missionsCompleted;
+    document.getElementById("statBestScore").innerText = stats.bestScore;
+    document.getElementById("statBestStreak").innerText = stats.bestStreak;
+    document.getElementById("statCorrect").innerText = stats.correct;
+    document.getElementById("statWrong").innerText = stats.wrong;
+}
+
+// ZAPIS STATYSTYK
+function saveStats() {
+    localStorage.setItem("mathWheelStats", JSON.stringify(stats));
+}
+
+// RESET STATYSTYK
+function resetStats() {
+    if (!confirm("Czy na pewno chcesz skasować statystyki?")) return;
+
+    stats = {
+        missionsCompleted: 0,
+        bestScore: 0,
+        bestStreak: 0,
+        correct: 0,
+        wrong: 0
+    };
+
+    saveStats();
+    loadStats();
+    alert("Statystyki wyczyszczone!");
+}
+
+// =============================================
+// AKTUALIZACJE STATYSTYK W CZASIE GRY
+// =============================================
+
+// zliczanie poprawnych i błędnych
+function recordCorrect() {
+    stats.correct++;
+    saveStats();
+}
+
+function recordWrong() {
+    stats.wrong++;
+    saveStats();
+}
+
+// misje
+function recordMissionComplete() {
+    stats.missionsCompleted++;
+    saveStats();
+}
+
+// endless – seria
+let currentStreak = 0;
+
+function recordStreak(correct) {
+    if (correct) {
+        currentStreak++;
+        if (currentStreak > stats.bestStreak) {
+            stats.bestStreak = currentStreak;
+            saveStats();
+        }
+    } else {
+        currentStreak = 0;
+    }
+}
+
+// najlepszy wynik ogólny
+function recordBestScore(score) {
+    if (score > stats.bestScore) {
+        stats.bestScore = score;
+        saveStats();
+    }
+}
+
+//// ==== KONIEC STATYSTYK ====
+
+// PRZY STARTCIE STRONY ŁADUJ STATYSTYKI
+window.onload = loadStats;
