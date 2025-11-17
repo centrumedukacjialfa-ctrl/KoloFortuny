@@ -1,85 +1,72 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f7faff;
+    font-family: Arial;
     text-align: center;
-    padding-top: 20px;
-}
-
-body.contrast {
-    background: black;
-    color: yellow;
+    background: #f5f5f5;
 }
 
 h1 {
     font-size: 48px;
+    margin-bottom: 20px;
 }
 
-/* KOŁO */
-#wheel {
-    width: 300px;
-    height: 300px;
-    border: 15px solid #444;
-    border-radius: 50%;
+#wheel-container {
+    position: relative;
+    width: 500px;
     margin: auto;
-    background: conic-gradient(
-        blue 0deg 90deg,
-        green 90deg 180deg,
-        yellow 180deg 270deg,
-        red 270deg 360deg
-    );
-    transition: transform 4s ease-out;
-    cursor: pointer;
 }
 
-/* BUTTONY */
-button {
-    font-size: 28px;
-    padding: 20px 40px;
-    margin: 15px;
-    border-radius: 15px;
-    border: none;
-    cursor: pointer;
-    background: #4da6ff;
-    color: white;
+#arrow {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 40px solid black;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-button:hover {
-    opacity: 0.9;
-}
-
-/* PANEL NAUCZYCIELA */
-#teacherPanel {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 25px;
-    width: 70%;
-    margin: auto;
-    border: 2px solid #999;
-}
-
-#teacherPanel select {
-    font-size: 24px;
-    margin: 10px;
-}
-
-/* WYNIKI */
-#scoreBoard {
-    margin-top: 25px;
-    font-size: 32px;
-}
-
-/* ODPOWIEDŹ */
-#answerSection input {
-    font-size: 34px;
-    padding: 10px;
-    width: 150px;
-}
-
-/* TRYB ĆWICZEŃ */
-#exercisePanel {
+#spinBtn {
     margin-top: 30px;
-    padding: 20px;
-    background: #e3f2ff;
-    border-radius: 20px;
+    padding: 20px 50px;
+    font-size: 28px;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#answerSection input {
+    font-size: 28px;
+    padding: 10px;
+    width: 120px;
+}
+
+#checkBtn {
+    font-size: 26px;
+    padding: 15px 30px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#taskBox {
+    margin-top: 20px;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+#result {
+    margin-top: 20px;
     font-size: 32px;
+    font-weight: bold;
+}
+
+#scoreBoard {
+    margin-top: 35px;
+    font-size: 28px;
 }
