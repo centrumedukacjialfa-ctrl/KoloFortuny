@@ -2,16 +2,22 @@
    GLOBAL
 ========================================= */
 body {
-    background: #222;
+    background: #1e1e1e;
     color: #fff;
     font-family: Arial, sans-serif;
     text-align: center;
     margin: 0;
-    padding-bottom: 50px;
+    padding-bottom: 80px;
 }
 
-h1, h2 {
-    text-shadow: 0 0 10px #000;
+h1 {
+    font-size: 46px;
+    margin-top: 20px;
+    text-shadow: 0 0 12px #000;
+}
+
+h2 {
+    font-size: 32px;
 }
 
 .hidden {
@@ -19,26 +25,26 @@ h1, h2 {
 }
 
 .panel {
-    background: #333;
+    background: #2c2c2c;
     padding: 20px;
-    margin: 20px auto;
     width: 500px;
+    margin: 15px auto;
     border-radius: 15px;
-    box-shadow: 0 0 15px #000;
+    box-shadow: 0 0 12px #000;
 }
 
 /* =========================================
-   TRYBY GRY – PRZYCISKI
+   PRZYCISKI GŁÓWNE
 ========================================= */
 
 .modeBtn {
     background: #444;
     color: white;
     border: 2px solid #777;
-    padding: 12px 20px;
-    font-size: 22px;
+    padding: 14px 20px;
+    font-size: 24px;
     margin: 10px;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     width: 280px;
     transition: 0.2s;
@@ -49,62 +55,44 @@ h1, h2 {
     transform: scale(1.05);
 }
 
-.lifeBtn {
-    background: #5533aa;
-    color: white;
-    border: 2px solid #aa88ff;
-    padding: 10px 15px;
-    font-size: 20px;
-    margin: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.lifeBtn.used {
-    background: #222;
-    border-color: #555;
-    opacity: 0.4;
-    cursor: default;
-}
-
 /* =========================================
    KOŁO FORTUNY
 ========================================= */
 
 #wheel-container {
     position: relative;
-    margin: 20px auto;
+    margin: 30px auto;
     width: 600px;
     height: 600px;
 }
 
 #arrow {
     position: absolute;
-    top: -15px;
+    top: -10px;
     left: 50%;
-    margin-left: -20px;
+    margin-left: -25px;
     width: 0;
     height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 40px solid yellow;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 50px solid yellow;
     z-index: 10;
 }
 
 #spinBtn {
     margin-top: 20px;
-    padding: 12px 25px;
-    font-size: 22px;
-    border-radius: 10px;
+    padding: 14px 30px;
+    font-size: 26px;
     background: orange;
-    border: 3px solid #cc7a00;
+    border: 3px solid #b36b00;
+    border-radius: 12px;
     cursor: pointer;
     transition: 0.2s;
 }
 
 #spinBtn:hover {
+    background: #ffb733;
     transform: scale(1.05);
-    background: #ffb200;
 }
 
 /* =========================================
@@ -112,15 +100,17 @@ h1, h2 {
 ========================================= */
 
 #taskBox {
-    margin: 20px auto;
+    margin-top: 25px;
+    background: #333;
     padding: 20px;
     width: 80%;
-    background: #333;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 14px;
     border: 3px solid #555;
-    border-radius: 15px;
-    font-size: 26px;
-    min-height: 80px;
-    line-height: 1.5;
+    font-size: 28px;
+    min-height: 120px;
+    line-height: 1.4;
 }
 
 /* =========================================
@@ -133,24 +123,24 @@ h1, h2 {
 
 #answerInput {
     padding: 10px;
-    font-size: 22px;
-    width: 200px;
-    border-radius: 8px;
+    width: 250px;
+    font-size: 26px;
+    border-radius: 10px;
     border: 2px solid #555;
 }
 
 #checkBtn {
-    padding: 10px 20px;
-    font-size: 22px;
-    border-radius: 10px;
-    margin-left: 10px;
-    background: #00aa00;
-    border: 2px solid #007700;
+    padding: 12px 25px;
+    font-size: 24px;
+    border-radius: 12px;
+    border: 2px solid #006600;
+    background: #009900;
+    color: #fff;
     cursor: pointer;
 }
 
 #checkBtn:hover {
-    background: #00cc00;
+    background: #00bb00;
 }
 
 /* =========================================
@@ -158,8 +148,8 @@ h1, h2 {
 ========================================= */
 
 #lifePanel {
-    font-size: 32px;
-    margin: 15px;
+    font-size: 40px;
+    margin-top: 10px;
 }
 
 /* =========================================
@@ -167,31 +157,70 @@ h1, h2 {
 ========================================= */
 
 #timer {
-    font-size: 40px;
-    color: #ff4444;
+    font-size: 44px;
+    color: #ff5555;
+    margin-top: 10px;
+}
+
+/* =========================================
+   TURNIEJ MATEMATYCZNY
+========================================= */
+
+#turnInfo {
+    font-size: 26px;
     margin-bottom: 10px;
 }
 
-/* =========================================
-   TABLICE WYNIKÓW
-========================================= */
-
-#scoreBoard {
-    width: 400px;
+#playerScores {
+    margin-top: 10px;
+    font-size: 22px;
+    line-height: 1.5;
 }
 
 /* =========================================
-   TELETURNIEJ
+   TELETURNIEJ ABC
 ========================================= */
 
 #quizAnswers button {
-    width: 350px;
+    width: 300px;
+    margin: 8px;
+    padding: 12px;
+    font-size: 22px;
+    border-radius: 12px;
+    border: 2px solid #777;
+    background: #404040;
+    cursor: pointer;
+}
+
+#quizAnswers button:hover {
+    background: #606060;
 }
 
 #quizPlayersBoard {
     font-size: 22px;
     margin-top: 15px;
-    line-height: 1.6;
+}
+
+/* =========================================
+   KOŁA RATUNKOWE
+========================================= */
+
+.lifeBtn {
+    padding: 12px 20px;
+    margin: 8px;
+    font-size: 22px;
+    border-radius: 12px;
+    border: 2px solid #999;
+    background: #5555aa;
+    color: white;
+    cursor: pointer;
+}
+
+.lifeBtn.used {
+    opacity: 0.4;
+    background: #222;
+    border-color: #444;
+    cursor: default;
 }
 
 /* =========================================
@@ -199,9 +228,9 @@ h1, h2 {
 ========================================= */
 
 @keyframes glow {
-    0% { box-shadow: 0 0 5px yellow; }
-    50% { box-shadow: 0 0 25px yellow; }
-    100% { box-shadow: 0 0 5px yellow; }
+    0% { box-shadow: 0 0 10px yellow; }
+    50% { box-shadow: 0 0 30px yellow; }
+    100% { box-shadow: 0 0 10px yellow; }
 }
 
 #spinBtn.glow {
