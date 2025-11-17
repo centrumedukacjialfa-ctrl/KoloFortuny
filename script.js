@@ -1,27 +1,34 @@
-// =====================
-//   ZMIENNE GLOBALNE
-// =====================
+//---------------------------------------------------------
+//                 ZMIENNE GLOBALNE
+//---------------------------------------------------------
 let ctx;
 let wheel;
 let angle = 0;
 let spinning = false;
+
 let lives = 3;
 let points = 0;
 let combo = 0;
+
 let superMode = false;
 let activeMultiplier = 1;
+
 let correctAnswer = 0;
 let mistakes = [];
 
+let tournamentActive = false;
+let currentPlayer = 0;
+let playerCount = 2;
+let players = [];
 
-// =====================
-//   SEGMENTY KOŁA
-// =====================
+//---------------------------------------------------------
+//              SEGMENTY KOŁA FORTUNY
+//---------------------------------------------------------
 const segments = [
     { color: "#ff9999", text: "+1 pkt", type: "normal", value: 1 },
     { color: "#99ff99", text: "+2 pkt", type: "normal", value: 2 },
     { color: "#9999ff", text: "+3 pkt", type: "normal", value: 3 },
-    { color: "#ffff99", text: "BONUS 2×", type: "bonus", mult: 2 },
+    { color: "#ffff99", text: "BONUS ×2", type: "bonus", mult: 2 },
     { color: "#ffcc99", text: "-2 pkt", type: "penalty", value: -2 },
     { color: "#ff99ff", text: "ZMIANA", type: "reroll" },
     { color: "#66ccff", text: "TRUDNE", type: "hard" },
@@ -32,10 +39,9 @@ const segments = [
     { color: "#ffcc66", text: "SUPER", type: "super" }
 ];
 
-
-// =====================
-//     RYSOWANIE KOŁA
-// =====================
+//---------------------------------------------------------
+//              RYSOWANIE KOŁA
+//---------------------------------------------------------
 window.onload = () => {
     wheel = document.getElementById("wheel");
     ctx = wheel.getContext("2d");
@@ -53,43 +59,58 @@ function drawWheel() {
         ctx.moveTo(250, 250);
         ctx.arc(250, 250, 250, start, start + arc);
         ctx.fill();
-        ctx.save();
 
+        ctx.save();
         ctx.translate(250, 250);
         ctx.rotate(start + arc / 2);
-        ctx.textAlign = "center";
+
         ctx.fillStyle = "black";
         ctx.font = "20px Arial";
+        ctx.textAlign = "center";
         ctx.fillText(segments[i].text, 150, 10);
+
         ctx.restore();
     }
 }
 
-
-// =====================
-//     SPIN KOŁA
-// =====================
+//---------------------------------------------------------
+//              ANIMACJA KOŁA
+//---------------------------------------------------------
 document.getElementById("spinBtn").onclick = spinWheel;
 
 function spinWheel() {
     if (spinning) return;
     spinning = true;
 
-    let spinTime = 2000 + Math.random() * 1500;
-    let start = Date.now();
+    let totalRotation = 360 * 5 + Math.random() * 360;
+    let start = null;
+    let duration = 3000;
 
-    let spinInterval = setInterval(() => {
-        angle += 0.15;
+    function animate(timestamp) {
+        if (!start) start = timestamp;
+
+        let progress = timestamp - start;
+        let t = Math.min(progress / duration, 1);
+
+        let ease = (--t) * t * t + 1;
+
+        angle = ease * (totalRotation * Math.PI / 180);
         drawWheel();
 
-        if (Date.now() - start > spinTime) {
-            clearInterval(spinInterval);
+        if (progress < duration) {
+            requestAnimationFrame(animate);
+        } else {
             spinning = false;
             stopWheel();
         }
-    }, 20);
+    }
+
+    requestAnimationFrame(animate);
 }
 
+//---------------------------------------------------------
+//               STOP KOŁA
+//---------------------------------------------------------
 function stopWheel() {
     let arc = Math.PI * 2 / segments.length;
     let index = Math.floor(((Math.PI * 1.5 - angle) % (Math.PI * 2)) / arc);
@@ -97,10 +118,9 @@ function stopWheel() {
     handleSegment(segments[index]);
 }
 
-
-// =====================
-//      ŻYCIA
-// =====================
+//---------------------------------------------------------
+//                     ŻYCIA
+//---------------------------------------------------------
 function resetLives() {
     lives = 3;
     document.getElementById("livesCount").innerText = lives;
@@ -117,65 +137,70 @@ function loseLife() {
     }
 }
 
-
-// =====================
-//    OBSŁUGA SEGMENTÓW
-// =====================
+//---------------------------------------------------------
+//               OBSŁUGA SEGMENTÓW
+//---------------------------------------------------------
 function handleSegment(s) {
-    switch(s.type) {
 
-        case "normal":
-            points += s.value;
-            break;
+    if (s.type === "normal") {
+        points += s.value;
+    }
 
-        case "penalty":
-            points += s.value;
-            break;
+    if (s.type === "penalty") {
+        points += s.value;
+    }
 
-        case "bonus":
-            activeMultiplier = s.mult;
-            alert("🎁 BONUS ×" + activeMultiplier);
-            break;
+    if (s.type === "bonus") {
+        activeMultiplier = s.mult;
+        alert("🎁 BONUS ×" + activeMultiplier);
+        generateTask();
+        updateScore();
+        return;
+    }
 
-        case "reroll":
-            alert("🔄 ZMIANA ZADANIA!");
-            generateTask();
-            return;
+    if (s.type === "reroll") {
+        alert("🔄 ZMIANA!");
+        generateTask();
+        return;
+    }
 
-        case "hard":
-            alert("❓ TRUDNE ZADANIE!");
-            generateHardTask();
-            return;
+    if (s.type === "hard") {
+        alert("❓ TRUDNE!");
+        generateHardTask();
+        return;
+    }
 
-        case "random":
-            alert("🎲 LOSOWE ZADANIE!");
-            generateRandomTask();
-            return;
+    if (s.type === "random") {
+        alert("🎲 LOSOWE!");
+        generateRandomTask();
+        return;
+    }
 
-        case "nothing":
-            alert("😐 NIC.");
-            return;
+    if (s.type === "nothing") {
+        alert("😐 NIC.");
+        generateTask();
+        return;
+    }
 
-        case "super":
-            alert("💥 SUPER ZADANIE!");
-            generateSuperTask();
-            return;
+    if (s.type === "super") {
+        alert("💥 SUPER!");
+        generateSuperTask();
+        return;
     }
 
     updateScore();
     generateTask();
 }
 
-
-// =====================
-//        ZADANIA
-// =====================
+//---------------------------------------------------------
+//               ZADANIA
+//---------------------------------------------------------
 function generateTask() {
     let a = Math.floor(Math.random() * 20) + 1;
     let b = Math.floor(Math.random() * 20) + 1;
 
     correctAnswer = a + b;
-    document.getElementById("taskBox").innerHTML = `<b>${a} + ${b}</b>`;
+    document.getElementById("taskBox").innerHTML = `${a} + ${b}`;
 }
 
 function generateHardTask() {
@@ -183,7 +208,7 @@ function generateHardTask() {
     let b = Math.floor(Math.random() * 40) + 10;
 
     correctAnswer = a - b;
-    document.getElementById("taskBox").innerHTML = `TRUDNE: <b>${a} - ${b}</b>`;
+    document.getElementById("taskBox").innerHTML = `TRUDNE: ${a} - ${b}`;
 }
 
 function generateSuperTask() {
@@ -191,79 +216,75 @@ function generateSuperTask() {
     let b = Math.floor(Math.random() * 100) + 20;
 
     correctAnswer = a + b;
-    document.getElementById("taskBox").innerHTML =
-        `SUPER: <b>${a} + ${b}</b> ( +10 / −5 )`;
-
     superMode = true;
+    document.getElementById("taskBox").innerHTML =
+        `SUPER: ${a} + ${b} ( +10 / −5 )`;
 }
 
 function generateRandomTask() {
     let r = Math.floor(Math.random() * 3);
-
     if (r === 0) generateTask();
     if (r === 1) generateHardTask();
     if (r === 2) generateSuperTask();
 }
 
-
-// =====================
-//        KOMBO
-// =====================
+//---------------------------------------------------------
+//                   KOMBO
+//---------------------------------------------------------
 function increaseCombo() {
     combo++;
 
-    if (combo === 2) { points += 1; alert("🔥 SERIA 2! +1"); }
-    if (combo === 4) { points += 3; alert("🔥🔥 SERIA 4! +3"); }
-    if (combo === 6) { points += 7; alert("🔥🔥🔥 SERIA 6! +7"); }
+    if (combo === 2) points += 1;
+    if (combo === 4) points += 3;
+    if (combo === 6) points += 7;
 }
 
 function resetCombo() {
     combo = 0;
 }
 
-
-// =====================
-//       POWTÓRKI
-// =====================
+//---------------------------------------------------------
+//                POWTÓRKI BŁĘDÓW
+//---------------------------------------------------------
 function addMistake(task, correct) {
     mistakes.push({ task: task, correct: correct });
 }
 
 function showMistakes() {
-    if (mistakes.length === 0) return;
+    if (!mistakes.length) return;
 
     let msg = "Zadania do powtórki:\n\n";
     mistakes.forEach(m => msg += m.task + " → " + m.correct + "\n");
-
     alert(msg);
 }
 
-
-// =====================
-//     SPRAWDZANIE
-// =====================
+//---------------------------------------------------------
+//               SPRAWDZANIE ODPOWIEDZI
+//---------------------------------------------------------
 document.getElementById("checkBtn").onclick = function() {
 
     let user = document.getElementById("answerInput").value;
+
+    if (tournamentActive) {
+        checkTournamentAnswer(user);
+        return;
+    }
 
     if (user == correctAnswer) {
 
         if (superMode) {
             points += 10;
-            alert("💥 SUPER +10!");
             superMode = false;
         }
 
         increaseCombo();
         updateScore();
         generateTask();
-    }
-    else {
+    } else {
         addMistake(document.getElementById("taskBox").innerText, correctAnswer);
 
         if (superMode) {
             points -= 5;
-            alert("💀 SUPER –5!");
             superMode = false;
         }
 
@@ -274,18 +295,15 @@ document.getElementById("checkBtn").onclick = function() {
     }
 };
 
-
-// =====================
-//     TRYBY GRY
-// =====================
+//---------------------------------------------------------
+//                 TRYBY GRY
+//---------------------------------------------------------
 function hideAllPanels() {
     document.getElementById("modePanel").classList.add("hidden");
     document.getElementById("missionPanel").classList.add("hidden");
     document.getElementById("timer").classList.add("hidden");
-
-    document.getElementById("wheel-container").classList.remove("hidden");
-    document.getElementById("spinBtn").classList.remove("hidden");
-    document.getElementById("answerSection").classList.remove("hidden");
+    document.getElementById("tournamentSetup").classList.add("hidden");
+    document.getElementById("tournamentBoard").classList.add("hidden");
 }
 
 function startMissionMode() {
@@ -337,7 +355,8 @@ function startTimer() {
 }
 
 function startTournamentMode() {
-    alert("Tryb turniejowy będzie dodany później.");
+    hideAllPanels();
+    document.getElementById("tournamentSetup").classList.remove("hidden");
 }
 
 function startPointsMode() {
@@ -356,10 +375,77 @@ function startEndlessMode() {
     generateTask();
 }
 
+//---------------------------------------------------------
+//                TRYB TURNIEJOWY
+//---------------------------------------------------------
+function createTournament() {
+    playerCount = parseInt(document.getElementById("playerCount").value);
+    players = [];
 
-// =====================
-//   AKTUALIZACJA
-// =====================
+    for (let i = 0; i < playerCount; i++) {
+        players.push({
+            score: 0,
+            lives: 3,
+            name: "Gracz " + (i + 1)
+        });
+    }
+
+    currentPlayer = 0;
+    tournamentActive = true;
+
+    document.getElementById("tournamentSetup").classList.add("hidden");
+    document.getElementById("tournamentBoard").classList.remove("hidden");
+
+    updateTournamentBoard();
+    generateTask();
+}
+
+function updateTournamentBoard() {
+    let info = `<h3>Tura: ${players[currentPlayer].name}</h3>`;
+    document.getElementById("turnInfo").innerHTML = info;
+
+    let scoreList = "";
+    players.forEach(p => {
+        scoreList += `${p.name}: ${p.score} pkt • ❤️ ${p.lives}<br>`;
+    });
+    document.getElementById("playerScores").innerHTML = scoreList;
+
+    document.getElementById("livesCount").innerText = players[currentPlayer].lives;
+}
+
+function nextPlayer() {
+    currentPlayer = (currentPlayer + 1) % playerCount;
+
+    while (players[currentPlayer].lives <= 0) {
+        currentPlayer = (currentPlayer + 1) % playerCount;
+    }
+
+    updateTournamentBoard();
+}
+
+function checkTournamentAnswer(user) {
+    let p = players[currentPlayer];
+
+    if (user == correctAnswer) {
+        p.score += 3;
+        alert("🎉 Poprawnie!");
+    } else {
+        p.lives--;
+        alert("❌ Źle!");
+    }
+
+    if (p.lives <= 0) {
+        alert(`${p.name} odpada!`);
+    }
+
+    updateTournamentBoard();
+    generateTask();
+    nextPlayer();
+}
+
+//---------------------------------------------------------
+//                AKTUALIZACJA WYNIKU
+//---------------------------------------------------------
 function updateScore() {
     document.getElementById("p1").innerText = points;
 }
