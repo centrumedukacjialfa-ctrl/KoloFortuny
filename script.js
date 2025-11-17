@@ -1,81 +1,24 @@
 /* ============================================================
-   GLOBALNE ZMIENNE
+   🌀 GLOBALNE ZMIENNE KLAWIATURA GRY
 ============================================================ */
 
 let wheel, ctx;
-let angle = 0;
-let spinning = false;
-
+let angle = 0;                 // aktualny kąt koła
+let spinning = false;          // czy koło się kręci
+let currentSegment = null;     // na którym polu się zatrzyma
 let lives = 3;
 let points = 0;
 let combo = 0;
-let correctAnswer = 0;
+let correctAnswer = "";
+let currentMode = "math";      // math / it / mission / quiz
+let tournamentActive = false;
 
-let currentMode = "math"; 
-let skipTurn = false;
 let doubleTask = false;
+let skipTurn = false;
 let superMode = false;
 
-let mistakes = [];
-
-let tournamentActive = false;
-let currentPlayer = 0;
-let players = [];
-let playerCount = 0;
-
 /* ============================================================
-   STATYSTYKI GRACZA
-============================================================ */
-
-let stats = {
-    bestScore: 0,
-    bestStreak: 0,
-    gamesPlayed: 0,
-    correct: 0,
-    wrong: 0,
-    achievements: []
-};
-
-function loadStats() {
-    let s = localStorage.getItem("wheelStats");
-    if (s) stats = JSON.parse(s);
-
-    document.getElementById("statBestScore").innerText = stats.bestScore;
-    document.getElementById("statBestStreak").innerText = stats.bestStreak;
-    document.getElementById("statGames").innerText = stats.gamesPlayed;
-    document.getElementById("statCorrect").innerText = stats.correct;
-    document.getElementById("statWrong").innerText = stats.wrong;
-
-    updateAchievementsPanel();
-}
-
-function saveStats() {
-    localStorage.setItem("wheelStats", JSON.stringify(stats));
-}
-
-function resetStats() {
-    localStorage.removeItem("wheelStats");
-    location.reload();
-}
-
-function grantAchievement(name) {
-    if (!stats.achievements.includes(name)) {
-        stats.achievements.push(name);
-        updateAchievementsPanel();
-    }
-}
-
-function updateAchievementsPanel() {
-    let box = document.getElementById("achievements");
-    if (stats.achievements.length === 0) {
-        box.innerHTML = "Brak osiągnięć.";
-    } else {
-        box.innerHTML = stats.achievements.map(a => `🏅 ${a}`).join("<br>");
-    }
-}
-
-/* ============================================================
-   SEGMENTY KOŁA (11 pól)
+   🎨 DEFINICJA SEGMENTÓW KOŁA (11 pól)
 ============================================================ */
 
 const segments = [
@@ -84,7 +27,7 @@ const segments = [
     { text: "+5 pkt", color1: "#5aff5a", color2: "#1c8f1c", type: "points", value: 5 },
     { text: "Zamrożenie", color1: "#6cd6ff", color2: "#0087c7", type: "freeze" },
     { text: "Tekstowe", color1: "#ffaaff", color2: "#d600d6", type: "text" },
-    { text: "BOMBA", color1: "#000", color2: "#333", type: "bomb" },
+    { text: "BOMBA", color1: "#000000", color2: "#444444", type: "bomb" },
     { text: "-5 pkt", color1: "#ff5050", color2: "#8a0000", type: "points", value: -5 },
     { text: "Cofnij turę", color1: "#cccccc", color2: "#7a7a7a", type: "back" },
     { text: "+10 pkt", color1: "#4cffc6", color2: "#009e7d", type: "points", value: 10 },
@@ -93,13 +36,11 @@ const segments = [
 ];
 
 /* ============================================================
-   RYSOWANIE KOŁA
+   🖌 RYSOWANIE KOŁA FORTUNY
 ============================================================ */
-
 window.onload = () => {
     wheel = document.getElementById("wheel");
     ctx = wheel.getContext("2d");
-    loadStats();
     drawWheel();
 };
 
@@ -114,6 +55,7 @@ function drawWheel() {
         let start = angle + i * arc;
         let end = start + arc;
 
+        // gradient segmentu
         let grad = ctx.createLinearGradient(0, 0, 600, 600);
         grad.addColorStop(0, segments[i].color1);
         grad.addColorStop(1, segments[i].color2);
@@ -124,6 +66,7 @@ function drawWheel() {
         ctx.fillStyle = grad;
         ctx.fill();
 
+        // tekst segmentu
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + arc / 2);
@@ -136,7 +79,7 @@ function drawWheel() {
 }
 
 /* ============================================================
-   KLIKNIĘCIE – ZAKRĘĆ KOŁEM
+   🔄 ANIMACJA KRĘCENIA KOŁA
 ============================================================ */
 
 document.getElementById("spinBtn").onclick = spinWheel;
@@ -145,22 +88,24 @@ function spinWheel() {
     if (spinning) return;
     spinning = true;
 
-    let totalRotation = 360 * 6 + Math.random() * 360;
+    let totalRotation = 360 * 4 + Math.random() * 360; // 4 obroty + losowa końcówka
     let start = null;
-    let duration = 3500;
+    let duration = 3500; // czas animacji
 
     function animate(time) {
         if (!start) start = time;
+        let progress = (time - start) / duration;
 
-        let t = (time - start) / duration;
-        if (t > 1) t = 1;
+        if (progress > 1) progress = 1;
 
-        let ease = 1 - Math.pow(1 - t, 3);
+        // efekt zwalniania
+        let ease = 1 - Math.pow(1 - progress, 3);
 
         angle = ease * (totalRotation * Math.PI / 180);
+
         drawWheel();
 
-        if (t < 1) {
+        if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
             spinning = false;
@@ -172,104 +117,128 @@ function spinWheel() {
 }
 
 /* ============================================================
-   PO ZATRZYMANIU – OD CZEGO ZALEŻY WYNIK
+   🎯 ZATRZYMANIE KOŁA – WYBÓR SEGMENTU
 ============================================================ */
 
 function stopWheel() {
-    let arc = (Math.PI * 2) / segments.length;
 
+    let arc = (Math.PI * 2) / segments.length;
     let index = Math.floor(((Math.PI * 1.5 - angle) % (Math.PI * 2)) / arc);
+
     if (index < 0) index += segments.length;
 
-    handleSegment(segments[index]);
+    currentSegment = segments[index];
+
+    console.log("Wylosowano segment:", currentSegment);
+
+    handleSegment(currentSegment);
+}
+
+/* ============================================================
+   🎁 OBSŁUGA SEGMENTÓW – wybór działania
+   (dalsze funkcje będą w JS 2–6)
+============================================================ */
+
+function handleSegment(seg) {
+    // Logika segmentów zostanie kontynuowana w JS2
+    // tutaj tylko przekierowanie zależne od trybu gry
+
+    if (currentMode === "math" || currentMode === "it") {
+        processSegmentForNormalGame(seg);
+    }
+
+    if (currentMode === "mission") {
+        processSegmentForMission(seg);
+    }
+
+    if (tournamentActive) {
+        handleSegmentTournament(seg);
+    }
 }
 /* ============================================================
-   ZADANIA MATEMATYCZNE
+   📘 ZADANIA MATEMATYCZNE
 ============================================================ */
 
 function generateMathTask() {
-    if (skipTurn) {
-        alert("❄ Pomijasz kolejkę!");
-        skipTurn = false;
-        return;
-    }
-
     let a = Math.floor(Math.random() * 20 + 1);
     let b = Math.floor(Math.random() * 20 + 1);
 
-    correctAnswer = a + b;
+    correctAnswer = (a + b).toString();
 
     document.getElementById("taskBox").innerHTML =
-        `🔢 Ile to: <b>${a} + ${b}</b>?`;
+        `🔢 <b>Oblicz:</b><br><br>
+         <span style='font-size: 36px;'>${a} + ${b}</span>`;
+    
+    showAnswerBox();
 }
 
-
 /* ============================================================
-   SUPER ZADANIE
+   ⭐ SUPER ZADANIE
 ============================================================ */
-function generateSuperTask() {
-    let a = Math.floor(Math.random() * 100 + 20);
-    let b = Math.floor(Math.random() * 100 + 20);
 
-    correctAnswer = a + b;
+function generateSuperTask() {
+    let a = Math.floor(Math.random() * 100 + 50);
+    let b = Math.floor(Math.random() * 100 + 50);
+
+    correctAnswer = (a + b).toString();
+    superMode = true;
 
     document.getElementById("taskBox").innerHTML =
         `⭐ <b>SUPER ZADANIE!</b><br><br>
-         Oblicz: <b>${a} + ${b}</b><br>
-         ✔ Poprawna: <b>+10 pkt</b><br>
-         ❌ Błędna: <b>-5 pkt</b>`;
+         <span style='font-size: 40px;'>${a} + ${b}</span><br><br>
+         ✔ Poprawna: +10 pkt<br>
+         ❌ Błędna: -5 pkt`;
 
-    superMode = true;
+    showAnswerBox();
 }
 
-
 /* ============================================================
-   ZADANIA TEKSTOWE
+   📖 ZADANIA TEKSTOWE
 ============================================================ */
 
-const names = ["Ala", "Ola", "Kuba", "Tomek", "Marek", "Zosia"];
-const items = ["jabłka", "cukierki", "ciastka", "klocki", "piłki"];
+const names = ["Ala", "Ola", "Zosia", "Kuba", "Marek", "Tomek", "Igor"];
+const items = ["jabłka", "ciastka", "cukierki", "klocki", "piłki", "kwiatki"];
 
 function generateTextTask() {
     let name = names[Math.floor(Math.random() * names.length)];
     let item = items[Math.floor(Math.random() * items.length)];
-
-    let a = Math.floor(Math.random() * 10 + 5);
+    let a = Math.floor(Math.random() * 10 + 4);
     let b = Math.floor(Math.random() * 5 + 1);
 
     if (Math.random() < 0.5) {
-        correctAnswer = a + b;
+        correctAnswer = (a + b).toString();
         document.getElementById("taskBox").innerHTML =
-            `📘 <b>Zadanie tekstowe</b><br><br>
+            `📗 <b>Zadanie tekstowe</b><br><br>
              ${name} miał(a) ${a} ${item}.<br>
-             Dostał(a) ${b} więcej.<br>
-             Ile ma teraz?`;
+             Dostał(a) jeszcze ${b}.<br><br>
+             Ile ma razem?`;
     } else {
-        correctAnswer = a - b;
+        correctAnswer = (a - b).toString();
         document.getElementById("taskBox").innerHTML =
             `📘 <b>Zadanie tekstowe</b><br><br>
              ${name} miał(a) ${a} ${item}.<br>
-             Oddał(a) ${b}.<br>
-             Ile zostało?`;
+             Oddał(a) ${b}.<br><br>
+             Ile mu zostało?`;
     }
+
+    showAnswerBox();
 }
 
-
 /* ============================================================
-   ZADANIA INFORMATYCZNE
+   🖥 ZADANIA INFORMATYCZNE (do zwykłego trybu)
 ============================================================ */
 
 const itTasks = [
-    { q: "Urządzenie do pisania liter to…", a: "klawiatura" },
+    { q: "Urządzenie do pisania tekstu to…", a: "klawiatura" },
     { q: "Urządzenie wskazujące to…", a: "mysz" },
-    { q: "Obrazki na pulpicie to…", a: "ikony" },
-    { q: "Program do rysowania w Windows to…", a: "paint" },
-    { q: "Pliki zapisujemy w…", a: "folderach" },
+    { q: "Co wyświetla obraz?", a: "monitor" },
+    { q: "Program do rysowania to…", a: "paint" },
     { q: "Przenośny komputer to…", a: "laptop" },
     { q: "Duży komputer to komputer…", a: "stacjonarny" },
+    { q: "Obrazki na pulpicie to…", a: "ikony" },
     { q: "Do słuchania służą…", a: "głośniki" },
-    { q: "Do mówienia używamy…", a: "mikrofonu" },
-    { q: "Program do pisania tekstu to…", a: "edytor tekstu" }
+    { q: "Do mówienia służy…", a: "mikrofon" },
+    { q: "Pliki zapisujemy w…", a: "folderach" }
 ];
 
 function generateITTask() {
@@ -277,129 +246,97 @@ function generateITTask() {
     correctAnswer = t.a.toLowerCase();
 
     document.getElementById("taskBox").innerHTML =
-        `🖥 <b>ZADANIE INFORMATYCZNE</b><br><br>${t.q}`;
+        `🖥 <b>Pytanie informatyczne</b><br><br>${t.q}`;
+
+    showAnswerBox();
 }
 
-
 /* ============================================================
-   WYBÓR TYPU ZADANIA W ZALEŻNOŚCI OD TRYBU
+   🎮 WYBÓR ZADANIA W ZALEŻNOŚCI OD TRYBU
 ============================================================ */
 
 function generateTaskMode() {
     if (currentMode === "math") generateMathTask();
     else if (currentMode === "it") generateITTask();
-    else return; // teleturniej używa innego systemu
+    else if (currentMode === "mission") generateMathTask(); 
 }
 
-
 /* ============================================================
-   CZĘŚĆ: SERIA / KOMBO
+   📥 POKAŻ OKNO ODPOWIEDZI
 ============================================================ */
 
-function increaseCombo() {
-    combo++;
-    if (combo === 5) grantAchievement("5 poprawnych pod rząd");
-    if (combo === 10) grantAchievement("10 poprawnych pod rząd");
+function showAnswerBox() {
+    document.getElementById("answerSection").classList.remove("hidden");
+    document.getElementById("answerInput").value = "";
+    document.getElementById("answerInput").focus();
 }
-
-function resetCombo() {
-    combo = 0;
-}
-
 
 /* ============================================================
-   CZĘŚĆ: ŻYCIA
-============================================================ */
-
-function loseLife() {
-    lives--;
-    document.getElementById("livesCount").innerText = lives;
-
-    if (lives <= 0) {
-        alert("❌ Koniec gry!");
-        stats.gamesPlayed++;
-        saveStats();
-        location.reload();
-    }
-}
-
-function resetLives() {
-    lives = 3;
-    document.getElementById("livesCount").innerText = lives;
-}
-
-
-/* ============================================================
-   SPRAWDZANIE ODPOWIEDZI (dla matematyki/informatyki)
+   🧠 SPRAWDZANIE ODPOWIEDZI
 ============================================================ */
 
 document.getElementById("checkBtn").onclick = checkAnswer;
 
 function checkAnswer() {
-
-    if (currentMode === "quiz") return; // teleturniej osobno
+    if (currentMode === "quiz") return; // teleturniej ma inną logikę
 
     let user = document.getElementById("answerInput").value.trim().toLowerCase();
 
-    // POPRAWNA
-    if (user == correctAnswer) {
-        points += superMode ? 10 : 1;
-        stats.correct++;
+    if (user === "") return;
 
-        increaseCombo();
-        if (combo > stats.bestStreak) stats.bestStreak = combo;
+    /* ====== POPRAWNA ODPOWIEDŹ ====== */
+    if (user === correctAnswer.toString().toLowerCase()) {
 
         if (superMode) {
-            grantAchievement("SUPER zadanie rozwiązane");
+            points += 10;
+            superMode = false;
+        } else if (doubleTask) {
+            points += 2;
+            doubleTask = false;
+        } else {
+            points += 1;
         }
 
-        superMode = false;
-
+        combo++;
         updateScore();
+
         generateTaskMode();
     }
 
-    // BŁĘDNA
+    /* ====== BŁĄD ====== */
     else {
-        stats.wrong++;
-        addMistake(document.getElementById("taskBox").innerText, correctAnswer);
+        if (superMode) {
+            points -= 5;
+            superMode = false;
+        }
 
-        if (superMode) points -= 5;
+        lives--;
+        combo = 0;
 
-        superMode = false;
+        document.getElementById("livesCount").innerText = lives;
 
-        loseLife();
-        resetCombo();
+        if (lives <= 0) {
+            alert("❌ Koniec gry!");
+            location.reload();
+            return;
+        }
+
         updateScore();
         generateTaskMode();
     }
-
-    if (points > stats.bestScore) stats.bestScore = points;
-    saveStats();
 }
 
-
 /* ============================================================
-   REJESTR BŁĘDÓW
-============================================================ */
-
-function addMistake(task, answer) {
-    mistakes.push(task + " = " + answer);
-}
-
-
-/* ============================================================
-   AKTUALIZACJA WYNIKU
+   🧮 AKTUALIZACJA WYNIKU
 ============================================================ */
 
 function updateScore() {
     document.getElementById("p1").innerText = points;
 }
 /* ============================================================
-   PANELE — UKRYWANIE / POKAZYWANIE
+   🧽 CZYSZCZENIE PANELI
 ============================================================ */
 function hideAllPanels() {
-    document.getElementById("modePanel").classList.add("hidden");
     document.getElementById("missionPanel").classList.add("hidden");
     document.getElementById("timer").classList.add("hidden");
     document.getElementById("tournamentSetup").classList.add("hidden");
@@ -411,29 +348,106 @@ function hideAllPanels() {
 }
 
 /* ============================================================
-   TRYB: MISJE
+   ❤️ ŻYCIA
 ============================================================ */
+function resetLives() {
+    lives = 3;
+    document.getElementById("livesCount").innerText = lives;
+}
 
-function startMissionMode() {
+/* ============================================================
+   🔢 TRYB MATEMATYCZNY
+============================================================ */
+function startMathMode() {
     hideAllPanels();
     resetLives();
     points = 0;
 
     currentMode = "math";
 
-    document.getElementById("missionDesc").innerText =
-        "Wykonaj 5 zadań poprawnie, aby przejść misję.";
-    document.getElementById("missionPanel").classList.remove("hidden");
-}
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("taskBox").classList.remove("hidden");
 
-function startMission() {
-    resetLives();
-    points = 0;
     generateTaskMode();
 }
 
 /* ============================================================
-   TRYB CZASOWY (10 s)
+   🖥 TRYB INFORMATYKA (normalny)
+============================================================ */
+function startITMode() {
+    hideAllPanels();
+    resetLives();
+    points = 0;
+
+    currentMode = "it";
+
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("taskBox").classList.remove("hidden");
+
+    alert("🖥 Tryb INFORMATYKA — pytania komputerowe!");
+
+    generateTaskMode();
+}
+
+/* ============================================================
+   🗺 TRYB MISJI
+============================================================ */
+
+let mission = 1;
+let missionGoal = 5;
+
+function startMissionMode() {
+    hideAllPanels();
+    resetLives();
+    points = 0;
+    combo = 0;
+
+    mission = 1;
+    currentMode = "mission";
+
+    document.getElementById("missionDesc").innerHTML =
+        `W misji <b>${mission}</b> wykonaj <b>${missionGoal}</b> poprawnych odpowiedzi!`;
+
+    document.getElementById("missionPanel").classList.remove("hidden");
+}
+
+function startMission() {
+    points = 0;
+    hideAllPanels();
+    document.getElementById("spinBtn").classList.remove("hidden");
+    generateTaskMode();
+}
+
+function processSegmentForMission(seg) {
+    if (seg.type === "points") points += seg.value;
+    if (seg.type === "super") generateSuperTask();
+    else generateTaskMode();
+
+    updateScore();
+
+    if (points >= missionGoal) {
+        alert(`🎉 Misja ${mission} ukończona!`);
+
+        mission++;
+        points = 0;
+
+        if (mission > 6) {
+            alert("🏆 Wszystkie misje ukończone!");
+            location.reload();
+            return;
+        }
+
+        hideAllPanels();
+
+        document.getElementById("missionDesc").innerHTML =
+            `Misja <b>${mission}</b>: zrób <b>${missionGoal}</b> poprawnych odpowiedzi.`;
+
+        document.getElementById("missionPanel").classList.remove("hidden");
+    }
+}
+
+/* ============================================================
+   ⏱ TRYB CZASOWY
 ============================================================ */
 
 let timerInterval = null;
@@ -441,13 +455,14 @@ let timerInterval = null;
 function startTimeMode() {
     hideAllPanels();
     resetLives();
-
-    currentMode = "math";
     points = 0;
 
-    document.getElementById("timer").classList.remove("hidden");
-    startTimer();
+    currentMode = "math";
 
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("timer").classList.remove("hidden");
+
+    startTimer();
     generateTaskMode();
 }
 
@@ -461,7 +476,7 @@ function startTimer() {
         timeLeft--;
         document.getElementById("timeLeft").innerText = timeLeft;
 
-        if (timeLeft <= 0) {
+        if (timeLeft === 0) {
             loseLife();
             startTimer();
             generateTaskMode();
@@ -470,20 +485,35 @@ function startTimer() {
 }
 
 /* ============================================================
-   TRYB DO X PUNKTÓW
+   ⭐ TRYB „DO X PUNKTÓW”
 ============================================================ */
 
 function startPointsMode() {
+    let goal = prompt("Do ilu punktów gramy?", "10");
+    if (!goal) return;
+
     hideAllPanels();
     resetLives();
     points = 0;
 
     currentMode = "math";
+    pointGoal = parseInt(goal);
+
+    document.getElementById("spinBtn").classList.remove("hidden");
     generateTaskMode();
 }
 
+let pointGoal = 10;
+
+function checkPointGoal() {
+    if (points >= pointGoal) {
+        alert(`🏆 Zdobyłeś ${points} punktów!`);
+        location.reload();
+    }
+}
+
 /* ============================================================
-   TRYB NIESKOŃCZONY
+   ♾ TRYB NIESKOŃCZONY
 ============================================================ */
 
 function startEndlessMode() {
@@ -492,413 +522,514 @@ function startEndlessMode() {
     points = 0;
 
     currentMode = "math";
+
+    document.getElementById("spinBtn").classList.remove("hidden");
+
     generateTaskMode();
 }
-
 /* ============================================================
-   TRYB INFORMATYKA (zwykły)
+   👥 TURNIEJ MATEMATYCZNY – WIELE GRACZY
 ============================================================ */
 
-function startITMode() {
-    hideAllPanels();
-    resetLives();
-    points = 0;
-
-    currentMode = "it";
-    alert("🖥 Tryb INFORMATYKA — odpowiadaj na pytania o komputerach!");
-    generateTaskMode();
-}
-
-/* ============================================================
-   TURNIEJ MATEMATYCZNY – USTAWIENIA
-============================================================ */
+let players = [];
+let currentPlayer = 0;
+let tournamentPointsGoal = 20;
 
 function startTournamentMode() {
     hideAllPanels();
+
     document.getElementById("tournamentSetup").classList.remove("hidden");
 }
 
 function createTournament() {
-    playerCount = parseInt(document.getElementById("playerCount").value);
+    let count = parseInt(document.getElementById("playerCount").value);
+
+    if (count < 2 || count > 10) {
+        alert("W turnieju może brać udział 2–10 graczy.");
+        return;
+    }
 
     players = [];
-    for (let i = 0; i < playerCount; i++) {
+
+    for (let i = 0; i < count; i++) {
+        let name = prompt(`Podaj imię gracza ${i + 1}:`);
+        if (!name || name.trim() === "") name = `Gracz ${i + 1}`;
+
         players.push({
-            name: "Gracz " + (i + 1),
-            score: 0,
+            name: name,
+            points: 0,
             lives: 3
         });
     }
 
     currentPlayer = 0;
     tournamentActive = true;
-    points = 0;
 
-    hideAllPanels();
+    document.getElementById("tournamentSetup").classList.add("hidden");
     document.getElementById("tournamentBoard").classList.remove("hidden");
+    document.getElementById("spinBtn").classList.remove("hidden");
+    document.getElementById("taskBox").classList.remove("hidden");
 
     updateTournamentBoard();
     generateTaskMode();
 }
 
 /* ============================================================
-   TURNIEJ MATEMATYCZNY – PRZEBIEG GRY
+   📝 AKTUALIZACJA TABLICY WYNIKÓW
 ============================================================ */
 
 function updateTournamentBoard() {
-    let current = players[currentPlayer];
+    let board = "";
 
+    for (let i = 0; i < players.length; i++) {
+        board += `<b>${players[i].name}</b>: 
+                  ${players[i].points} pkt | ❤️ ${players[i].lives}<br>`;
+    }
+
+    document.getElementById("playerScores").innerHTML = board;
     document.getElementById("turnInfo").innerHTML =
-        `<h3>Runda gracza: ${current.name}</h3>
-         ❤️ Życia: ${current.lives} &nbsp;&nbsp;
-         ⭐ Punkty: ${current.score}`;
-
-    let list = "";
-    players.forEach(p => {
-        if (p.lives <= 0) {
-            list += `<span style="opacity:0.4;">${p.name}: ❌ Odpadł</span><br>`;
-        } else {
-            list += `${p.name}: ⭐ ${p.score} pkt • ❤️ ${p.lives}<br>`;
-        }
-    });
-
-    document.getElementById("playerScores").innerHTML = list;
+        `Tura gracza: <b>${players[currentPlayer].name}</b>`;
 }
 
 /* ============================================================
-   PRZESUWANIE TURY W TURNIEJU MATEMATYCZNYM
-============================================================ */
-
-function nextTournamentPlayer() {
-    let startIndex = currentPlayer;
-
-    do {
-        currentPlayer = (currentPlayer + 1) % players.length;
-    } while (players[currentPlayer].lives <= 0 && currentPlayer !== startIndex);
-}
-
-function previousPlayer() {
-    do {
-        currentPlayer--;
-        if (currentPlayer < 0) currentPlayer = players.length - 1;
-    } while (players[currentPlayer].lives <= 0);
-}
-
-/* ============================================================
-   KONSEKWENCJE POLA KOŁA W TURNIEJU MATEMATYCZNYM
+   🎯 OBSŁUGA SEGMENTU W TRYBIE TURNIEJOWYM
 ============================================================ */
 
 function handleSegmentTournament(seg) {
     let p = players[currentPlayer];
 
     if (seg.type === "points") {
-        p.score += seg.value;
-        updateTournamentBoard();
-        generateTaskMode();
-        return;
+        p.points += seg.value;
     }
 
-    if (seg.type === "bomb") {
-        p.lives--;
-        alert("💣 BOMBA! Gracz traci 1 życie.");
-        if (p.lives <= 0) alert(p.name + " odpadł!");
-        updateTournamentBoard();
-        nextTournamentPlayer();
-        return;
-    }
-
-    if (seg.type === "freeze") {
-        alert("❄ Pominięcie następnej tury!");
-        nextTournamentPlayer();
-        return;
-    }
-
-    if (seg.type === "back") {
-        alert("↩ Cofasz się o jednego gracza!");
-        previousPlayer();
-        updateTournamentBoard();
-        return;
-    }
-
-    if (seg.type === "text") {
-        generateTextTask();
-        return;
-    }
-
-    if (seg.type === "super") {
-        generateSuperTask();
-        return;
-    }
-
-    if (seg.type === "double") {
+    else if (seg.type === "double") {
         doubleTask = true;
-        alert("🎯 Podwójne zadanie!");
-        generateTaskMode();
+    }
+
+    else if (seg.type === "freeze") {
+        alert("❄ Tura zamrożona – kolejny gracz!");
+        nextPlayer();
         return;
     }
 
-    if (seg.type === "random") {
-        let list = ["points", "bomb", "freeze", "text", "super"];
-        let chosen = list[Math.floor(Math.random() * list.length)];
-        alert("🎁 RANDOM: " + chosen.toUpperCase());
+    else if (seg.type === "random") {
+        alert("🔀 Losowe zadanie!");
+    }
 
-        handleSegmentTournament({ type: chosen, value: 3 });
-        return;
+    else if (seg.type === "bomb") {
+        p.lives--;
+        alert(`💣 ${p.name} traci 1 życie!`);
+
+        if (p.lives <= 0) {
+            alert(`☠ ${p.name} odpada z gry!`);
+            players.splice(currentPlayer, 1);
+
+            if (players.length === 1) {
+                alert(`🏆 Zwycięzca: ${players[0].name}!`);
+                location.reload();
+                return;
+            }
+
+            if (currentPlayer >= players.length) currentPlayer = 0;
+            updateTournamentBoard();
+            return;
+        }
+    }
+
+    else if (seg.type === "super") {
+        generateSuperTask();
+    }
+
+    else if (seg.type === "text") {
+        generateTextTask();
+    }
+
+    else {
+        generateTaskMode();
+    }
+
+    updateTournamentBoard();
+}
+
+/* ============================================================
+   🧠 SPRAWDZANIE ODPOWIEDZI W TURNIEJU
+============================================================ */
+
+function checkAnswerTournament() {
+    let p = players[currentPlayer];
+    let user = document.getElementById("answerInput").value.trim().toLowerCase();
+
+    if (user === correctAnswer.toString().toLowerCase()) {
+
+        if (superMode) {
+            p.points += 10;
+            superMode = false;
+        } else if (doubleTask) {
+            p.points += 2;
+            doubleTask = false;
+        } else {
+            p.points += 1;
+        }
+
+        updateTournamentBoard();
+
+        if (p.points >= tournamentPointsGoal) {
+            alert(`🏆 ${p.name} wygrał turniej!`);
+            location.reload();
+            return;
+        }
+
+        generateTaskMode();
+    }
+
+    else {
+        p.lives--;
+        combo = 0;
+
+        if (p.lives <= 0) {
+            alert(`❌ ${p.name} odpada!`);
+            players.splice(currentPlayer, 1);
+
+            if (players.length === 1) {
+                alert(`🏆 Zwycięzca: ${players[0].name}!`);
+                location.reload();
+                return;
+            }
+        }
+
+        updateTournamentBoard();
+        nextPlayer();
+        generateTaskMode();
     }
 }
+
 /* ============================================================
-   🎤 TELETURNIEJ INFORMATYCZNY – WIELU GRACZY
+   🔄 ZMIANA GRACZA
+============================================================ */
+
+function nextPlayer() {
+    currentPlayer++;
+
+    if (currentPlayer >= players.length) currentPlayer = 0;
+
+    updateTournamentBoard();
+}
+/* ============================================================
+   🎤 TELETURNIEJ ABC – WIELE GRACZY
 ============================================================ */
 
 let quizPlayers = [];
-let quizPlayerIndex = 0;
-let quizTournamentRunning = false;
-
-let quizQuestions = [
-    { q: "Urządzenie do pisania liter to…", a: "Klawiatura", w1: "Mysz", w2: "Monitor" },
-    { q: "Obrazki na pulpicie to…", a: "Ikony", w1: "Okna", w2: "Pliki" },
-    { q: "Program do rysowania to…", a: "Paint", w1: "Word", w2: "Excel" },
-    { q: "Urządzenie wskazujące to…", a: "Mysz", w1: "Głośnik", w2: "RAM" },
-    { q: "Gdzie zapisujemy pliki?", a: "W folderach", w1: "W koszu", w2: "Na pulpicie" },
-    { q: "Przenośny komputer to…", a: "Laptop", w1: "Wieża", w2: "Router" },
-    { q: "Służy do nagrywania obrazu…", a: "Kamera", w1: "Mysz", w2: "Monitor" },
-    { q: "Program do pisania tekstu to…", a: "Edytor tekstu", w1: "Paint", w2: "Kalkulator" }
-];
-
-let usedPhone = false;
-let usedPublic = false;
-let used5050 = false;
-
-
-/* ============================================================
-   START PANELU TURNIEJU
-============================================================ */
+let quizCurrent = 0;
 
 function startQuizTournament() {
     hideAllPanels();
     document.getElementById("quizTournamentSetup").classList.remove("hidden");
 }
 
-
-/* ============================================================
-   ROZPOCZĘCIE GRY TURNIEJOWEJ
-============================================================ */
-
 function startQuizTournamentGame() {
-
     let count = parseInt(document.getElementById("quizTournamentCount").value);
+
+    if (count < 2 || count > 10) {
+        alert("Teleturniej: 2–10 graczy!");
+        return;
+    }
+
     quizPlayers = [];
 
     for (let i = 0; i < count; i++) {
+        let name = prompt(`Imię gracza ${i + 1}:`);
+        if (!name) name = "Gracz " + (i + 1);
+
         quizPlayers.push({
-            name: "Gracz " + (i + 1),
-            score: 0,
-            lives: 3,
-            phone: false,
-            public: false,
-            half: false
+            name: name,
+            points: 0,
+            lifes: 3
         });
     }
 
-    quizTournamentRunning = true;
-    quizPlayerIndex = 0;
-    quizIndex = 0;
+    quizCurrent = 0;
+    currentMode = "quiz";
 
-    hideAllPanels();
-
+    document.getElementById("quizTournamentSetup").classList.add("hidden");
     document.getElementById("quizTournamentBoard").classList.remove("hidden");
     document.getElementById("quizAnswers").classList.remove("hidden");
-    document.getElementById("lifelines").classList.remove("hidden");
 
-    updateQuizTournamentPanel();
-    loadQuizQuestionTournament();
+    document.getElementById("spinBtn").classList.add("hidden");
+    document.getElementById("taskBox").classList.remove("hidden");
+
+    resetLifelines();
+    updateQuizBoard();
+    generateQuizQuestion();
 }
 
-
 /* ============================================================
-   WYŚWIETLANIE AKTUALNEGO GRACZA I TABLICY GRACZY
+   🧩 PYTANIA ABC (INFORMATYKA)
 ============================================================ */
 
-function updateQuizTournamentPanel() {
-
-    let p = quizPlayers[quizPlayerIndex];
-
-    document.getElementById("quizTurnInfo").innerHTML =
-        `<h3>Tura gracza: ${p.name}</h3>
-         ❤️ Życia: ${p.lives} &nbsp;&nbsp;
-         ⭐ Punkty: ${p.score}`;
-
-    let list = "";
-    quizPlayers.forEach(pl => {
-        if (pl.lives <= 0) {
-            list += `<span style="opacity:0.3;">${pl.name}: ❌ odpadł</span><br>`;
-        } else {
-            list += `${pl.name}: ❤️ ${pl.lives} • ⭐ ${pl.score}<br>`;
-        }
-    });
-
-    document.getElementById("quizPlayersBoard").innerHTML = list;
-
-    // aktualizacja ikon kół ratunkowych
-    document.getElementById("phoneBtn").classList.toggle("used", p.phone);
-    document.getElementById("publicBtn").classList.toggle("used", p.public);
-    document.getElementById("halfBtn").classList.toggle("used", p.half);
-}
-
+const quizQuestions = [
+    { q: "Co służy do pisania?", a: "Klawiatura", w1: "Mysz", w2: "Monitor" },
+    { q: "Co wyświetla obraz?", a: "Monitor", w1: "Głośniki", w2: "Mysz" },
+    { q: "Co służy do słuchania?", a: "Głośniki", w1: "Monitor", w2: "Drukarka" },
+    { q: "Co nagrywa obraz?", a: "Kamera", w1: "Mikrofon", w2: "Klawiatura" },
+    { q: "Co łączy komputer z Internetem?", a: "Router", w1: "Klawiatura", w2: "Pendrive" },
+    { q: "Co służy do rysowania?", a: "Paint", w1: "Word", w2: "Excel" },
+    { q: "Co służy do pisania dokumentów?", a: "Edytor tekstu", w1: "Paint", w2: "Kalkulator" },
+    { q: "Hasła powinno się…", a: "Chronić", w1: "Udostępniać", w2: "Pisać na monitorze" },
+    { q: "Co to spam?", a: "Niechciana poczta", w1: "Program antywirusowy", w2: "Plik muzyczny" },
+    { q: "Bezpieczna strona zaczyna się od…", a: "HTTPS", w1: "HTTP", w2: "WWW" }
+];
 
 /* ============================================================
-   WCZYTYWANIE PYTANIA ABC
+   🎤 GENEROWANIE PYTANIA ABC
 ============================================================ */
 
-function loadQuizQuestionTournament() {
+function generateQuizQuestion() {
+    let q = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
 
-    let q = quizQuestions[quizIndex];
-    let answers = shuffle([q.a, q.w1, q.w2]);
+    correctAnswer = q.a;
 
     document.getElementById("taskBox").innerHTML =
-        `🎤 <b>Pytanie ${quizIndex + 1} / ${quizQuestions.length}</b><br><br>${q.q}`;
+        `<b style='font-size: 30px;'>${q.q}</b>`;
 
-    let html = "";
-    answers.forEach(a => {
-        html += `<button class="modeBtn" onclick="checkQuizTournament('${a}')">${a}</button><br>`;
-    });
+    let answers = shuffle([q.a, q.w1, q.w2]);
 
-    document.getElementById("quizAnswers").innerHTML = html;
+    document.getElementById("quizAnswers").innerHTML = `
+        <button onclick="quizAnswer('${answers[0]}')">A: ${answers[0]}</button><br>
+        <button onclick="quizAnswer('${answers[1]}')">B: ${answers[1]}</button><br>
+        <button onclick="quizAnswer('${answers[2]}')">C: ${answers[2]}</button><br>
+    `;
 }
-
-
-/* ============================================================
-   SPRAWDZANIE ODPOWIEDZI W TELETURNIEJU
-============================================================ */
-
-function checkQuizTournament(answer) {
-
-    let current = quizPlayers[quizPlayerIndex];
-    let correct = quizQuestions[quizIndex].a;
-
-    if (answer === correct) {
-        current.score++;
-        alert("✔ Poprawna odpowiedź!");
-    } else {
-        current.lives--;
-        alert("❌ Błędna odpowiedź!");
-    }
-
-    if (current.lives <= 0) {
-        alert(current.name + " odpada z teleturnieju!");
-    }
-
-    quizIndex++;
-    if (quizIndex >= quizQuestions.length) quizIndex = 0;
-
-    nextQuizTournamentPlayer();
-    checkQuizTournamentWinner();
-
-    updateQuizTournamentPanel();
-    loadQuizQuestionTournament();
-}
-
-
-/* ============================================================
-   KOŁA RATUNKOWE
-============================================================ */
-
-function usePhone() {
-    let p = quizPlayers[quizPlayerIndex];
-    if (p.phone) return;
-    p.phone = true;
-
-    let q = quizQuestions[quizIndex];
-    let hint = Math.random() < 0.85 ? q.a : q.w1;
-
-    alert("📞 Przyjaciel mówi: „Chyba to: " + hint + "”.");
-    updateQuizTournamentPanel();
-}
-
-function usePublic() {
-    let p = quizPlayers[quizPlayerIndex];
-    if (p.public) return;
-    p.public = true;
-
-    let q = quizQuestions[quizIndex];
-
-    let votes = {
-        [q.a]: 60 + Math.floor(Math.random() * 20),
-        [q.w1]: 10 + Math.floor(Math.random() * 20),
-        [q.w2]: 5 + Math.floor(Math.random() * 10)
-    };
-
-    alert(
-        "👥 Wyniki publiczności:\n\n" +
-        `${q.a}: ${votes[q.a]}%\n` +
-        `${q.w1}: ${votes[q.w1]}%\n` +
-        `${q.w2}: ${votes[q.w2]}%`
-    );
-
-    updateQuizTournamentPanel();
-}
-
-function use5050() {
-    let p = quizPlayers[quizPlayerIndex];
-    if (p.half) return;
-    p.half = true;
-
-    let q = quizQuestions[quizIndex];
-    let wrong = [q.w1, q.w2];
-    let removed = wrong[Math.floor(Math.random() * 2)];
-
-    let buttons = document.querySelectorAll("#quizAnswers button");
-    buttons.forEach(btn => {
-        if (btn.innerText === removed) btn.style.display = "none";
-    });
-
-    updateQuizTournamentPanel();
-}
-
-
-/* ============================================================
-   PRZECHODZENIE DO NASTĘPNEGO ŻYJĄCEGO GRACZA
-============================================================ */
-
-function nextQuizTournamentPlayer() {
-
-    let start = quizPlayerIndex;
-
-    do {
-        quizPlayerIndex = (quizPlayerIndex + 1) % quizPlayers.length;
-    } while (quizPlayers[quizPlayerIndex].lives <= 0
-          && quizPlayerIndex !== start);
-}
-
-
-/* ============================================================
-   SPRAWDZENIE, CZY JEST ZWYCIĘZCA
-============================================================ */
-
-function checkQuizTournamentWinner() {
-
-    let alive = quizPlayers.filter(p => p.lives > 0);
-
-    if (alive.length === 1) {
-
-        hideAllPanels();
-        document.getElementById("taskBox").innerHTML =
-            `🏆 <b>Zwycięzca teleturnieju:</b><br><br>
-             <h2>${alive[0].name}</h2>
-             Punkty: <b>${alive[0].score}</b>`;
-
-        document.getElementById("quizAnswers").classList.add("hidden");
-        document.getElementById("lifelines").classList.add("hidden");
-
-        grantAchievement("Wygrana w turnieju informatycznym");
-    }
-}
-
-
-/* ============================================================
-   FUNKCJE POMOCNICZE
-============================================================ */
 
 function shuffle(arr) {
     return arr.sort(() => Math.random() - 0.5);
 }
+
+/* ============================================================
+   👉 WYBÓR ODPOWIEDZI W TELETURNIEJU
+============================================================ */
+
+function quizAnswer(ans) {
+    let p = quizPlayers[quizCurrent];
+
+    if (ans === correctAnswer) {
+        p.points += 2;
+    } else {
+        p.lifes--;
+        if (p.lifes <= 0) {
+            alert(`☠ ${p.name} odpada z teleturnieju!`);
+            quizPlayers.splice(quizCurrent, 1);
+
+            if (quizPlayers.length === 1) {
+                alert(`🏆 Zwycięzca: ${quizPlayers[0].name}!`);
+                location.reload();
+                return;
+            }
+        }
+    }
+
+    nextQuizPlayer();
+    updateQuizBoard();
+    resetLifelines();
+    generateQuizQuestion();
+}
+
+/* ============================================================
+   🔄 ZMIANA GRACZA W TELETURNIEJU
+============================================================ */
+
+function nextQuizPlayer() {
+    quizCurrent++;
+    if (quizCurrent >= quizPlayers.length) quizCurrent = 0;
+}
+
+/* ============================================================
+   📊 AKTUALIZACJA TABLICY
+============================================================ */
+
+function updateQuizBoard() {
+    let html = "<h3>Wyniki:</h3>";
+    for (let p of quizPlayers) {
+        html += `${p.name}: ${p.points} pkt | ❤️ ${p.lifes}<br>`;
+    }
+    document.getElementById("quizPlayersBoard").innerHTML = html;
+
+    document.getElementById("quizTurnInfo").innerHTML =
+        `Tura: <b>${quizPlayers[quizCurrent].name}</b>`;
+}
+
+/* ============================================================
+   ❤️ KOŁA RATUNKOWE
+============================================================ */
+
+function resetLifelines() {
+    document.getElementById("lifelines").classList.remove("hidden");
+
+    document.querySelectorAll(".lifeBtn").forEach(btn => {
+        btn.classList.remove("used");
+    });
+}
+
+/* === 📞 Telefon do przyjaciela === */
+function usePhone() {
+    if (document.getElementById("phoneBtn").classList.contains("used")) return;
+
+    document.getElementById("phoneBtn").classList.add("used");
+
+    alert("📞 Przyjaciel mówi: 'Myślę, że odpowiedź to: " + correctAnswer + "'");
+}
+
+/* === 👥 Pytanie do publiczności === */
+function usePublic() {
+    if (document.getElementById("publicBtn").classList.contains("used")) return;
+
+    document.getElementById("publicBtn").classList.add("used");
+
+    let msg = `👥 Publiczność głosowała:\n`;
+
+    msg += `${correctAnswer}: 70%\n`;
+
+    let wrong = quizQuestions.find(q => q.a === correctAnswer);
+    msg += `${wrong.w1}: 20%\n`;
+    msg += `${wrong.w2}: 10%`;
+
+    alert(msg);
+}
+
+/* === ➗ 50/50 === */
+function use5050() {
+    if (document.getElementById("halfBtn").classList.contains("used")) return;
+
+    document.getElementById("halfBtn").classList.add("used");
+
+    let wrong = quizQuestions.find(q => q.a === correctAnswer);
+
+    let buttons = document.querySelectorAll("#quizAnswers button");
+
+    let removed = 0;
+
+    buttons.forEach(btn => {
+        if (removed < 2 && !btn.innerText.includes(correctAnswer)) {
+            btn.style.visibility = "hidden";
+            removed++;
+        }
+    });
+}
+/* ============================================================
+   🧨 OBSŁUGA SEGMENTÓW W TRYBIE NORMALNYM (math / it)
+============================================================ */
+
+function processSegmentForNormalGame(seg) {
+
+    if (seg.type === "points") {
+        points += seg.value;
+        updateScore();
+        generateTaskMode();
+    }
+
+    else if (seg.type === "text") {
+        generateTextTask();
+    }
+
+    else if (seg.type === "bomb") {
+        lives--;
+        alert("💣 BOMBA! Tracisz 1 życie!");
+        document.getElementById("livesCount").innerText = lives;
+
+        if (lives <= 0) {
+            alert("❌ Koniec gry!");
+            location.reload();
+            return;
+        }
+
+        generateTaskMode();
+    }
+
+    else if (seg.type === "double") {
+        alert("✨ Kolejne zadanie za podwójne punkty!");
+        doubleTask = true;
+        generateTaskMode();
+    }
+
+    else if (seg.type === "freeze") {
+        alert("❄ Zamrożenie — nic się nie dzieje!");
+        generateTaskMode();
+    }
+
+    else if (seg.type === "back") {
+        points -= 2;
+        if (points < 0) points = 0;
+        updateScore();
+        alert("↩ Cofnięcie — tracisz 2 punkty!");
+        generateTaskMode();
+    }
+
+    else if (seg.type === "super") {
+        generateSuperTask();
+    }
+
+    else if (seg.type === "random") {
+        let r = Math.random();
+        if (r < 0.33) generateTextTask();
+        else if (r < 0.66) generateITTask();
+        else generateMathTask();
+    }
+}
+
+/* ============================================================
+   ❌ STRATA ŻYCIA (czasówka)
+============================================================ */
+function loseLife() {
+    lives--;
+    document.getElementById("livesCount").innerText = lives;
+
+    if (lives <= 0) {
+        alert("❌ Koniec gry!");
+        location.reload();
+    }
+}
+
+/* ============================================================
+   🔧 BLOKOWANIE PRZYCISKÓW W CZASIE KRĘCENIA
+============================================================ */
+
+function lockUI() {
+    document.getElementById("spinBtn").disabled = true;
+}
+function unlockUI() {
+    document.getElementById("spinBtn").disabled = false;
+}
+
+/* ============================================================
+   🔄 GLOBALNY HANDLER – SPRAWDZANIE W KTÓRYM TRYBIE JESTEŚ
+============================================================ */
+
+document.getElementById("checkBtn").onclick = () => {
+    if (currentMode === "quiz") return; // teleturniej obsługuje własną logikę
+
+    if (tournamentActive) {
+        checkAnswerTournament();
+    } else {
+        checkAnswer();
+    }
+};
+
+/* ============================================================
+   📌 BEZPIECZEŃSTWO — BLOKADA PUSTEGO INPUTA
+============================================================ */
+
+document.getElementById("answerInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        document.getElementById("checkBtn").click();
+    }
+});
+
+/* ============================================================
+   🔚 OSTATECZNE ODNOWIENIE INTERFEJSU
+============================================================ */
+
+function initGame() {
+    document.getElementById("taskBox").classList.add("hidden");
+    document.getElementById("answerSection").classList.add("hidden");
+    document.getElementById("spinBtn").classList.add("hidden");
+}
+initGame();
