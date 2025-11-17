@@ -225,3 +225,65 @@ h1 {
     margin-top: 10px;
     text-align: left;
 }
+/* ============================
+   ANIMACJE – ETAP 5
+============================ */
+
+/* A — DRŻENIE KOŁA */
+.wheel-shake {
+    animation: shakeWheel 0.5s ease-in-out;
+}
+
+@keyframes shakeWheel {
+    0% { transform: rotate(0deg) translateX(0); }
+    20% { transform: rotate(1deg) translateX(-3px); }
+    40% { transform: rotate(-1deg) translateX(3px); }
+    60% { transform: rotate(1deg) translateX(-3px); }
+    80% { transform: rotate(-1deg) translateX(3px); }
+    100% { transform: rotate(0deg) translateX(0); }
+}
+
+/* B — BŁYSK POPRAWNEJ ODPOWIEDZI */
+.correct-flash {
+    animation: correctFlash 0.6s ease-out;
+}
+
+@keyframes correctFlash {
+    0% { background: #00ff00; }
+    100% { background: transparent; }
+}
+
+/* C — WSTRZĄS PRZY BŁĘDZIE */
+.wrong-shake {
+    animation: wrongShake 0.4s ease-in-out;
+}
+
+@keyframes wrongShake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
+}
+
+/* D — ANIMOWANE GWIAZDKI W MISJACH */
+.mission-star-animate {
+    animation: starPop 0.5s ease-out;
+}
+
+@keyframes starPop {
+    0% { transform: scale(0.4); opacity: 0; }
+    80% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+/* E — PŁYNNE POJAWIANIE SIĘ ZADAŃ */
+.task-fade {
+    animation: fadeInTask 0.5s ease-out;
+}
+
+@keyframes fadeInTask {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

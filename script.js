@@ -9,6 +9,37 @@ const sndCorrect = document.getElementById("sndCorrect");
 const sndWrong = document.getElementById("sndWrong");
 const sndBeep = document.getElementById("sndBeep");
 const sndAlarm = document.getElementById("sndAlarm");
+// FUNKCJE ANIMACJI
+function animateWheel() {
+    canvas.classList.remove("wheel-shake");
+    void canvas.offsetWidth;
+    canvas.classList.add("wheel-shake");
+}
+
+function animateCorrect() {
+    const box = document.getElementById("result");
+    box.classList.remove("correct-flash");
+    void box.offsetWidth;
+    box.classList.add("correct-flash");
+}
+
+function animateWrong() {
+    const box = document.getElementById("result");
+    box.classList.remove("wrong-shake");
+    void box.offsetWidth;
+    box.classList.add("wrong-shake");
+}
+
+function animateTask() {
+    const box = document.getElementById("taskBox");
+    box.classList.remove("task-fade");
+    void box.offsetWidth;
+    box.classList.add("task-fade");
+}
+
+function animateStar(starElement) {
+    starElement.classList.add("mission-star-animate");
+}
 
 let gameMode = null;       
 // "mission", "time", "tournament", "points", "endless"
