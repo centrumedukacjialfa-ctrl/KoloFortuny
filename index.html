@@ -2,24 +2,50 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Matematyczne Koło Fortuny – Zaawansowane Zadania</title>
+    <title>Matematyczne Koło Fortuny – Pełna Gra</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>🎡 Matematyczne Koło Fortuny</h1>
 
-<!-- WYBÓR TYPU ZADANIA -->
-<div id="taskTypePanel">
-    <h2>🧠 Wybierz typ zadania</h2>
-    <select id="taskStyleSelect">
-        <option value="classic">Klasyczne działania</option>
-        <option value="dots">Działania obrazkowe (kropki)</option>
-        <option value="story">Zadania tekstowe (historyjki)</option>
-        <option value="missing">Puste okienko</option>
-        <option value="compare">Porównywanie liczb</option>
-        <option value="mix">MIX wszystkich typów</option>
-    </select>
+<!-- PANEL TRYBÓW GRY -->
+<div id="modePanel">
+    <h2>Wybierz tryb gry</h2>
+
+    <button class="modeBtn" onclick="startMissionMode()">⭕ Misje (6 poziomów)</button>
+    <button class="modeBtn" onclick="startTimeMode()">⏱ Tryb czasowy (10s)</button>
+    <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej (2–10 graczy)</button>
+    <button class="modeBtn" onclick="startPointsMode()">⭐ Gra do X punktów</button>
+    <button class="modeBtn" onclick="startEndlessMode()">♾ Tryb nieskończony</button>
+</div>
+
+<!-- PANEL USTAWIEŃ TRYBU TURNIEJU -->
+<div id="tournamentSetup" class="hidden">
+    <h2>Tryb turniejowy</h2>
+    <label>Liczba graczy (2–10):</label>
+    <input type="number" id="tournamentPlayers" min="2" max="10" value="2">
+    <button onclick="beginTournament()">Start turnieju</button>
+</div>
+
+<!-- PANEL USTAWIEŃ TRYBU DO PUNKTÓW -->
+<div id="pointsSetup" class="hidden">
+    <h2>Cel gry</h2>
+    <label>Gra do ilu punktów?</label>
+    <input type="number" id="pointsGoal" min="5" max="200" value="20">
+    <button onclick="beginPointsGame()">Rozpocznij grę</button>
+</div>
+
+<!-- PANEL MISJI -->
+<div id="missionPanel" class="hidden">
+    <h2>🗺 Misja <span id="missionNumber">1</span> z 6</h2>
+    <div id="missionStars"></div>
+    <button onclick="startMission()">Start misji</button>
+</div>
+
+<!-- LICZNIK CZASU W TRYBIE CZASOWYM -->
+<div id="timer" class="hidden">
+    ⏱ <span id="timeLeft">10</span> s
 </div>
 
 <!-- KOŁO -->
@@ -28,12 +54,12 @@
     <canvas id="wheel" width="500" height="500"></canvas>
 </div>
 
-<button id="spinBtn">Zakręć kołem</button>
+<button id="spinBtn" class="hidden">Zakręć kołem</button>
 
 <div id="taskBox"></div>
 
 <!-- ODPOWIEDŹ -->
-<div id="answerSection" style="display:none;">
+<div id="answerSection" class="hidden">
     <div class="label">Twoja odpowiedź:</div>
     <input type="text" id="answerInput">
     <button id="checkBtn">Sprawdź</button>
@@ -41,8 +67,14 @@
 
 <div id="result"></div>
 
-<!-- PUNKTY -->
-<div id="scoreBoard">
+<!-- TURNIEJ: TABLICA GRACZY -->
+<div id="tournamentTable" class="hidden">
+    <h2>Wyniki turnieju</h2>
+    <div id="tournamentList"></div>
+</div>
+
+<!-- NORMALNA TABLICA WYNIKÓW -->
+<div id="scoreBoard" class="hidden">
     <h2>Wyniki</h2>
     <p>Gracz 1: <span id="p1">0</span></p>
     <p>Gracz 2: <span id="p2">0</span></p>
