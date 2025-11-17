@@ -1,85 +1,176 @@
+/* ------------------------------
+   GLOBALNE USTAWIENIA
+--------------------------------*/
 body {
     text-align: center;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #ececec, #ffffff);
+    margin: 0;
+    padding: 0;
 }
 
-h1 {
-    font-size: 50px;
+h1#title {
+    font-size: 48px;
+    margin-top: 20px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px #999;
+    color: #222;
+}
+
+/* Panele */
+.panel {
+    width: 60%;
+    margin: 25px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #999;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
 .hidden {
     display: none !important;
 }
 
+/* ------------------------------
+   PRZYCISKI
+--------------------------------*/
 .modeBtn {
     margin: 10px;
-    padding: 15px 40px;
-    font-size: 25px;
+    padding: 18px 45px;
+    font-size: 26px;
+    font-weight: bold;
     cursor: pointer;
     border-radius: 15px;
     border: 2px solid #333;
-    background: white;
+    background: #fafafa;
+    transition: 0.2s;
 }
 
+.modeBtn:hover {
+    background: #dfefff;
+}
+
+#spinBtn {
+    font-size: 30px;
+    padding: 15px 40px;
+    margin-top: 20px;
+    border-radius: 15px;
+    border: 3px solid #222;
+    background: #f5f5f5;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#spinBtn:hover {
+    background: #d0e8ff;
+}
+
+/* ------------------------------
+   ŻYCIA
+--------------------------------*/
 #lifePanel {
     font-size: 40px;
     margin-top: 10px;
     margin-bottom: 20px;
+    font-weight: bold;
 }
 
-#missionPanel,
-#modePanel,
-#scoreBoard {
-    margin: 20px auto;
-    padding: 20px;
-    width: 60%;
-    background: white;
-    border-radius: 20px;
-    border: 2px solid #777;
-}
-
+/* ------------------------------
+   ZADANIE
+--------------------------------*/
 #taskBox {
-    font-size: 40px;
-    margin-top: 25px;
-    min-height: 50px;
+    font-size: 44px;
+    margin-top: 30px;
+    min-height: 60px;
+    font-weight: bold;
 }
 
+/* ------------------------------
+   ODPOWIEDŹ
+--------------------------------*/
 #answerSection {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 #answerInput {
     font-size: 30px;
-    width: 150px;
+    width: 180px;
     text-align: center;
+    padding: 5px;
 }
 
+/* ------------------------------
+   KOŁO FORTUNY — WERSJA TV PREMIUM
+--------------------------------*/
 #wheel-container {
-    margin: 30px auto;
+    margin: 40px auto;
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 600px;
 }
 
+/* Realistyczna strzałka 3D */
 #arrow {
     width: 0;
     height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom: 40px solid red;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #ff3333;
     position: absolute;
-    top: -40px;
+    top: -50px;
     left: 50%;
     transform: translateX(-50%);
+    filter: drop-shadow(3px 3px 3px #444);
 }
 
-#spinBtn {
-    font-size: 25px;
-    padding: 12px 30px;
-    margin-top: 10px;
+/* ------------------------------
+   TABLICE WYNIKÓW
+--------------------------------*/
+#scoreBoard p {
+    font-size: 32px;
 }
 
-#timer {
-    font-size: 40px;
+/* ------------------------------
+   PANEL STATYSTYK
+--------------------------------*/
+#statsPanel h2 {
+    font-size: 36px;
+}
+
+#statsPanel p {
+    font-size: 26px;
+    margin: 10px;
+}
+
+#achievements {
+    font-size: 30px;
+    margin-top: 20px;
+    padding: 15px;
+    border: 2px dashed #888;
+    border-radius: 15px;
+}
+
+/* ------------------------------
+   TURNIEJ
+--------------------------------*/
+#turnInfo {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+#playerScores {
+    font-size: 26px;
+    line-height: 1.6;
+}
+
+/* ------------------------------
+   ANIMACJE ELEMENTÓW
+--------------------------------*/
+button, #wheel, #arrow {
+    transition: 0.25s ease;
+}
+
+button:active {
+    transform: scale(0.97);
 }
