@@ -1,81 +1,138 @@
-//---------------------------------------------------------
-//                 ZMIENNE GLOBALNE
-//---------------------------------------------------------
-let ctx;
-let wheel;
+/* ============================================================
+     GLOBALNE ZMIENNE
+============================================================ */
+let wheel, ctx;
 let angle = 0;
 let spinning = false;
 
 let lives = 3;
 let points = 0;
 let combo = 0;
-
-let superMode = false;
-let activeMultiplier = 1;
-
 let correctAnswer = 0;
+let skipTurn = false;
+let doubleTask = false;
+let superMode = false;
+
 let mistakes = [];
 
 let tournamentActive = false;
 let currentPlayer = 0;
-let playerCount = 2;
 let players = [];
+let playerCount = 0;
 
-//---------------------------------------------------------
-//              SEGMENTY KOŁA FORTUNY
-//---------------------------------------------------------
+let stats = {
+    bestScore: 0,
+    bestStreak: 0,
+    gamesPlayed: 0,
+    correct: 0,
+    wrong: 0,
+    achievements: []
+};
+
+/* ============================================================
+     ŁADOWANIE STATYSTYK
+============================================================ */
+function loadStats() {
+    let s = localStorage.getItem("wheelStats");
+    if (s) stats = JSON.parse(s);
+
+    document.getElementById("statBestScore").innerText = stats.bestScore;
+    document.getElementById("statBestStreak").innerText = stats.bestStreak;
+    document.getElementById("statGames").innerText = stats.gamesPlayed;
+    document.getElementById("statCorrect").innerText = stats.correct;
+    document.getElementById("statWrong").innerText = stats.wrong;
+
+    updateAchievementsPanel();
+}
+
+function saveStats() {
+    localStorage.setItem("wheelStats", JSON.stringify(stats));
+}
+
+function resetStats() {
+    localStorage.removeItem("wheelStats");
+    location.reload();
+}
+
+/* ============================================================
+     OSIĄGNIĘCIA
+============================================================ */
+function grantAchievement(name) {
+    if (!stats.achievements.includes(name)) {
+        stats.achievements.push(name);
+        updateAchievementsPanel();
+    }
+}
+
+function updateAchievementsPanel() {
+    document.getElementById("achievements").innerHTML =
+        stats.achievements.length === 0
+            ? "Brak osiągnięć."
+            : stats.achievements.map(a => "🏅 " + a).join("<br>");
+}
+
+/* ============================================================
+     SEGMENTY KOŁA TV
+============================================================ */
 const segments = [
-    { color: "#ff9999", text: "+1 pkt", type: "normal", value: 1 },
-    { color: "#99ff99", text: "+2 pkt", type: "normal", value: 2 },
-    { color: "#9999ff", text: "+3 pkt", type: "normal", value: 3 },
-    { color: "#ffff99", text: "BONUS ×2", type: "bonus", mult: 2 },
-    { color: "#ffcc99", text: "-2 pkt", type: "penalty", value: -2 },
-    { color: "#ff99ff", text: "ZMIANA", type: "reroll" },
-    { color: "#66ccff", text: "TRUDNE", type: "hard" },
-    { color: "#ccff66", text: "LOSOWE", type: "random" },
-    { color: "#ff6666", text: "-5 pkt", type: "penalty", value: -5 },
-    { color: "#66ffcc", text: "+5 pkt", type: "normal", value: 5 },
-    { color: "#cccccc", text: "PUSTE", type: "nothing" },
-    { color: "#ffcc66", text: "SUPER", type: "super" }
+    { text: "+2 pkt", color1: "#ff4747", color2: "#b80000", type: "points", value: 2 },
+    { text: "Podwójne", color1: "#ffe266", color2: "#ffb300", type: "double" },
+    { text: "+5 pkt", color1: "#5aff5a", color2: "#1c8f1c", type: "points", value: 5 },
+    { text: "Zamrożenie", color1: "#6cd6ff", color2: "#0087c7", type: "freeze" },
+    { text: "Tekstowe", color1: "#ffaaff", color2: "#d600d6", type: "text" },
+    { text: "BOMBA", color1: "#000000", color2: "#333333", type: "bomb" },
+    { text: "-5 pkt", color1: "#ff5050", color2: "#8a0000", type: "points", value: -5 },
+    { text: "Cofnij turę", color1: "#cccccc", color2: "#7a7a7a", type: "back" },
+    { text: "+10 pkt", color1: "#4cffc6", color2: "#009e7d", type: "points", value: 10 },
+    { text: "Losowe", color1: "#ffff66", color2: "#d1d100", type: "random" },
+    { text: "SUPER", color1: "#ff9f1c", color2: "#c36800", type: "super" }
 ];
 
-//---------------------------------------------------------
-//              RYSOWANIE KOŁA
-//---------------------------------------------------------
+/* ============================================================
+     RYSOWANIE KOŁA TV
+============================================================ */
 window.onload = () => {
     wheel = document.getElementById("wheel");
     ctx = wheel.getContext("2d");
+    loadStats();
     drawWheel();
 };
 
 function drawWheel() {
-    let arc = Math.PI * 2 / segments.length;
+    let cx = 300, cy = 300;
+    let radius = 280;
+    let arc = (Math.PI * 2) / segments.length;
+
+    ctx.clearRect(0, 0, 600, 600);
 
     for (let i = 0; i < segments.length; i++) {
-        let start = angle + i * arc;
+        let startAngle = angle + i * arc;
+        let endAngle = startAngle + arc;
+
+        let grad = ctx.createLinearGradient(0, 0, 600, 600);
+        grad.addColorStop(0, segments[i].color1);
+        grad.addColorStop(1, segments[i].color2);
 
         ctx.beginPath();
-        ctx.fillStyle = segments[i].color;
-        ctx.moveTo(250, 250);
-        ctx.arc(250, 250, 250, start, start + arc);
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.fillStyle = grad;
         ctx.fill();
 
         ctx.save();
-        ctx.translate(250, 250);
-        ctx.rotate(start + arc / 2);
-
-        ctx.fillStyle = "black";
-        ctx.font = "20px Arial";
+        ctx.translate(cx, cy);
+        ctx.rotate(startAngle + arc / 2);
         ctx.textAlign = "center";
-        ctx.fillText(segments[i].text, 150, 10);
-
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 26px Arial";
+        ctx.fillText(segments[i].text, radius * 0.65, 10);
         ctx.restore();
     }
 }
 
-//---------------------------------------------------------
-//              ANIMACJA KOŁA
-//---------------------------------------------------------
+/* ============================================================
+     ANIMACJA PREMIUM
+============================================================ */
 document.getElementById("spinBtn").onclick = spinWheel;
 
 function spinWheel() {
@@ -84,20 +141,21 @@ function spinWheel() {
 
     let totalRotation = 360 * 5 + Math.random() * 360;
     let start = null;
-    let duration = 3000;
+    let duration = 3500;
 
-    function animate(timestamp) {
-        if (!start) start = timestamp;
+    function animate(time) {
+        if (!start) start = time;
 
-        let progress = timestamp - start;
-        let t = Math.min(progress / duration, 1);
+        let t = (time - start) / duration;
+        if (t > 1) t = 1;
 
-        let ease = (--t) * t * t + 1;
+        // easing OUT
+        let ease = 1 - Math.pow(1 - t, 3);
 
         angle = ease * (totalRotation * Math.PI / 180);
         drawWheel();
 
-        if (progress < duration) {
+        if (t < 1) {
             requestAnimationFrame(animate);
         } else {
             spinning = false;
@@ -108,161 +166,176 @@ function spinWheel() {
     requestAnimationFrame(animate);
 }
 
-//---------------------------------------------------------
-//               STOP KOŁA
-//---------------------------------------------------------
+/* ============================================================
+     ZATRZYMANIE KOŁA
+============================================================ */
 function stopWheel() {
-    let arc = Math.PI * 2 / segments.length;
+    let arc = (Math.PI * 2) / segments.length;
     let index = Math.floor(((Math.PI * 1.5 - angle) % (Math.PI * 2)) / arc);
+
     if (index < 0) index += segments.length;
-    handleSegment(segments[index]);
+    let seg = segments[index];
+
+    handleSegment(seg);
 }
 
-//---------------------------------------------------------
-//                     ŻYCIA
-//---------------------------------------------------------
-function resetLives() {
-    lives = 3;
-    document.getElementById("livesCount").innerText = lives;
-}
-
-function loseLife() {
-    lives--;
-    document.getElementById("livesCount").innerText = lives;
-
-    if (lives <= 0) {
-        alert("❌ Koniec gry!");
-        showMistakes();
-        location.reload();
-    }
-}
-
-//---------------------------------------------------------
-//               OBSŁUGA SEGMENTÓW
-//---------------------------------------------------------
+/* ============================================================
+     LOGIKA POLA KOŁA
+============================================================ */
 function handleSegment(s) {
 
-    if (s.type === "normal") {
+    if (s.type === "points") {
         points += s.value;
-    }
-
-    if (s.type === "penalty") {
-        points += s.value;
-    }
-
-    if (s.type === "bonus") {
-        activeMultiplier = s.mult;
-        alert("🎁 BONUS ×" + activeMultiplier);
-        generateTask();
         updateScore();
-        return;
-    }
-
-    if (s.type === "reroll") {
-        alert("🔄 ZMIANA!");
-        generateTask();
-        return;
-    }
-
-    if (s.type === "hard") {
-        alert("❓ TRUDNE!");
-        generateHardTask();
-        return;
-    }
-
-    if (s.type === "random") {
-        alert("🎲 LOSOWE!");
-        generateRandomTask();
-        return;
-    }
-
-    if (s.type === "nothing") {
-        alert("😐 NIC.");
         generateTask();
         return;
     }
 
     if (s.type === "super") {
-        alert("💥 SUPER!");
+        superMode = true;
         generateSuperTask();
         return;
     }
 
-    updateScore();
-    generateTask();
+    if (s.type === "double") {
+        doubleTask = true;
+        alert("🎯 Podwójne zadanie!");
+        generateTask();
+        return;
+    }
+
+    if (s.type === "freeze") {
+        skipTurn = true;
+        alert("❄ Zamrożenie! Omijasz następną kolejkę.");
+        generateTask();
+        return;
+    }
+
+    if (s.type === "bomb") {
+        alert("💣 BOMBA! Tracisz 1 życie.");
+        loseLife();
+        generateTask();
+        return;
+    }
+
+    if (s.type === "back") {
+        alert("↩ Cofnij turę!");
+        if (tournamentActive) previousPlayer();
+        generateTask();
+        return;
+    }
+
+    if (s.type === "random") {
+        let list = ["points", "bomb", "freeze", "text", "super"];
+        let chosen = list[Math.floor(Math.random() * list.length)];
+        alert("🎁 Losowe pole: " + chosen.toUpperCase());
+
+        if (chosen === "text") generateTextTask();
+        if (chosen === "super") generateSuperTask();
+        if (chosen === "bomb") loseLife();
+        if (chosen === "freeze") skipTurn = true;
+        if (chosen === "points") points += 3;
+
+        updateScore();
+        return;
+    }
+
+    if (s.type === "text") {
+        generateTextTask();
+        return;
+    }
 }
 
-//---------------------------------------------------------
-//               ZADANIA
-//---------------------------------------------------------
+/* ============================================================
+     ZADANIA MATEMATYCZNE
+============================================================ */
 function generateTask() {
-    let a = Math.floor(Math.random() * 20) + 1;
-    let b = Math.floor(Math.random() * 20) + 1;
+    if (skipTurn) {
+        alert("❄ Pominięto kolejkę!");
+        skipTurn = false;
+        return;
+    }
+
+    let a = Math.floor(Math.random() * 20 + 1);
+    let b = Math.floor(Math.random() * 20 + 1);
 
     correctAnswer = a + b;
     document.getElementById("taskBox").innerHTML = `${a} + ${b}`;
 }
 
-function generateHardTask() {
-    let a = Math.floor(Math.random() * 60) + 20;
-    let b = Math.floor(Math.random() * 40) + 10;
-
-    correctAnswer = a - b;
-    document.getElementById("taskBox").innerHTML = `TRUDNE: ${a} - ${b}`;
-}
-
+/* SUPER ZADANIE */
 function generateSuperTask() {
-    let a = Math.floor(Math.random() * 100) + 50;
-    let b = Math.floor(Math.random() * 100) + 20;
-
+    let a = Math.floor(Math.random() * 100 + 50);
+    let b = Math.floor(Math.random() * 100 + 20);
     correctAnswer = a + b;
-    superMode = true;
+
     document.getElementById("taskBox").innerHTML =
-        `SUPER: ${a} + ${b} ( +10 / −5 )`;
+        `⭐ SUPER: ${a} + ${b} ( +10 / -5 )`;
 }
 
-function generateRandomTask() {
-    let r = Math.floor(Math.random() * 3);
-    if (r === 0) generateTask();
-    if (r === 1) generateHardTask();
-    if (r === 2) generateSuperTask();
+/* TEKSTOWE ZADANIA */
+const names = ["Ala", "Ola", "Tomek", "Kuba", "Zosia", "Marek"];
+const items = ["jabłka", "cukierki", "piłki", "klocki", "samochodziki", "ciastka"];
+
+function generateTextTask() {
+    let name = names[Math.floor(Math.random() * names.length)];
+    let item = items[Math.floor(Math.random() * items.length)];
+
+    let a = Math.floor(Math.random() * 10 + 3);
+    let b = Math.floor(Math.random() * 5 + 1);
+
+    let addOrSub = Math.random() < 0.5 ? "add" : "sub";
+
+    if (addOrSub === "add") {
+        correctAnswer = a + b;
+        document.getElementById("taskBox").innerHTML =
+            `${name} miał(a) ${a} ${item}. Dostał(a) ${b} więcej. Ile ma teraz?`;
+    } else {
+        correctAnswer = a - b;
+        document.getElementById("taskBox").innerHTML =
+            `${name} miał(a) ${a} ${item}. Oddał(a) ${b}. Ile zostało?`;
+    }
 }
 
-//---------------------------------------------------------
-//                   KOMBO
-//---------------------------------------------------------
+/* ============================================================
+     KOMBO
+============================================================ */
 function increaseCombo() {
     combo++;
-
-    if (combo === 2) points += 1;
-    if (combo === 4) points += 3;
-    if (combo === 6) points += 7;
+    if (combo === 5) grantAchievement("5 poprawnych pod rząd");
+    if (combo === 10) grantAchievement("10 poprawnych pod rząd");
 }
 
 function resetCombo() {
     combo = 0;
 }
 
-//---------------------------------------------------------
-//                POWTÓRKI BŁĘDÓW
-//---------------------------------------------------------
-function addMistake(task, correct) {
-    mistakes.push({ task: task, correct: correct });
+/* ============================================================
+     ŻYCIA
+============================================================ */
+function loseLife() {
+    lives--;
+    document.getElementById("livesCount").innerText = lives;
+
+    if (lives <= 0) {
+        alert("❌ Koniec gry!");
+        stats.gamesPlayed++;
+        saveStats();
+        location.reload();
+    }
 }
 
-function showMistakes() {
-    if (!mistakes.length) return;
-
-    let msg = "Zadania do powtórki:\n\n";
-    mistakes.forEach(m => msg += m.task + " → " + m.correct + "\n");
-    alert(msg);
+function resetLives() {
+    lives = 3;
+    document.getElementById("livesCount").innerText = lives;
 }
 
-//---------------------------------------------------------
-//               SPRAWDZANIE ODPOWIEDZI
-//---------------------------------------------------------
-document.getElementById("checkBtn").onclick = function() {
+/* ============================================================
+     SPRAWDZANIE ODPOWIEDZI
+============================================================ */
+document.getElementById("checkBtn").onclick = checkAnswer;
 
+function checkAnswer() {
     let user = document.getElementById("answerInput").value;
 
     if (tournamentActive) {
@@ -271,33 +344,120 @@ document.getElementById("checkBtn").onclick = function() {
     }
 
     if (user == correctAnswer) {
+        points += superMode ? 10 : 1;
 
-        if (superMode) {
-            points += 10;
-            superMode = false;
-        }
+        stats.correct++;
+
+        if (superMode) grantAchievement("SUPER zadanie rozwiązane");
 
         increaseCombo();
+        superMode = false;
+
+        if (combo > stats.bestStreak) stats.bestStreak = combo;
+
         updateScore();
         generateTask();
     } else {
+        stats.wrong++;
+
         addMistake(document.getElementById("taskBox").innerText, correctAnswer);
 
-        if (superMode) {
-            points -= 5;
-            superMode = false;
-        }
+        points -= superMode ? 5 : 0;
+        superMode = false;
 
         loseLife();
         resetCombo();
         updateScore();
         generateTask();
     }
-};
 
-//---------------------------------------------------------
-//                 TRYBY GRY
-//---------------------------------------------------------
+    if (points > stats.bestScore) stats.bestScore = points;
+
+    saveStats();
+}
+
+/* ============================================================
+     POWTÓRKI
+============================================================ */
+function addMistake(task, answer) {
+    mistakes.push(`${task} = ${answer}`);
+}
+
+/* ============================================================
+     TURNIEJ
+============================================================ */
+function startTournamentMode() {
+    hideAllPanels();
+    document.getElementById("tournamentSetup").classList.remove("hidden");
+}
+
+function createTournament() {
+    playerCount = parseInt(document.getElementById("playerCount").value);
+    players = [];
+
+    for (let i = 0; i < playerCount; i++) {
+        players.push({ score: 0, lives: 3, name: "Gracz " + (i + 1) });
+    }
+
+    tournamentActive = true;
+    currentPlayer = 0;
+
+    document.getElementById("tournamentSetup").classList.add("hidden");
+    document.getElementById("tournamentBoard").classList.remove("hidden");
+
+    updateTournamentPanel();
+    generateTask();
+}
+
+function updateTournamentPanel() {
+    let info = `<h3>Tura: ${players[currentPlayer].name}</h3>`;
+    document.getElementById("turnInfo").innerHTML = info;
+
+    let list = "";
+    players.forEach(p => list += `${p.name}: ${p.score} pkt • ❤️ ${p.lives}<br>`);
+    document.getElementById("playerScores").innerHTML = list;
+
+    document.getElementById("livesCount").innerText = players[currentPlayer].lives;
+}
+
+function nextPlayer() {
+    currentPlayer = (currentPlayer + 1) % playerCount;
+
+    while (players[currentPlayer].lives <= 0) {
+        currentPlayer = (currentPlayer + 1) % playerCount;
+    }
+
+    updateTournamentPanel();
+}
+
+function previousPlayer() {
+    currentPlayer = (currentPlayer - 1 + playerCount) % playerCount;
+    updateTournamentPanel();
+}
+
+function checkTournamentAnswer(user) {
+    let p = players[currentPlayer];
+
+    if (user == correctAnswer) {
+        p.score += 3;
+        alert("✔ Poprawnie!");
+    } else {
+        p.lives--;
+        alert("❌ Źle!");
+    }
+
+    if (p.lives <= 0) {
+        alert(`${p.name} odpada!`);
+    }
+
+    updateTournamentPanel();
+    generateTask();
+    nextPlayer();
+}
+
+/* ============================================================
+     TRYBY GRY
+============================================================ */
 function hideAllPanels() {
     document.getElementById("modePanel").classList.add("hidden");
     document.getElementById("missionPanel").classList.add("hidden");
@@ -311,28 +471,42 @@ function startMissionMode() {
     document.getElementById("missionPanel").classList.remove("hidden");
     resetLives();
     points = 0;
-    updateScore();
     generateTask();
 }
 
 function startMission() {
     resetLives();
     points = 0;
-    updateScore();
     generateTask();
 }
+
+function startPointsMode() {
+    hideAllPanels();
+    resetLives();
+    points = 0;
+    generateTask();
+}
+
+function startEndlessMode() {
+    hideAllPanels();
+    resetLives();
+    points = 0;
+    generateTask();
+}
+
+/* TRYB CZASOWY */
+let timerInterval = null;
 
 function startTimeMode() {
     hideAllPanels();
     document.getElementById("timer").classList.remove("hidden");
+
     resetLives();
     points = 0;
-    updateScore();
+
     startTimer();
     generateTask();
 }
-
-let timerInterval;
 
 function startTimer() {
     clearInterval(timerInterval);
@@ -345,8 +519,6 @@ function startTimer() {
         document.getElementById("timeLeft").innerText = timeLeft;
 
         if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            alert("⏱ Czas minął!");
             loseLife();
             startTimer();
             generateTask();
@@ -354,98 +526,9 @@ function startTimer() {
     }, 1000);
 }
 
-function startTournamentMode() {
-    hideAllPanels();
-    document.getElementById("tournamentSetup").classList.remove("hidden");
-}
-
-function startPointsMode() {
-    hideAllPanels();
-    resetLives();
-    points = 0;
-    updateScore();
-    generateTask();
-}
-
-function startEndlessMode() {
-    hideAllPanels();
-    resetLives();
-    points = 0;
-    updateScore();
-    generateTask();
-}
-
-//---------------------------------------------------------
-//                TRYB TURNIEJOWY
-//---------------------------------------------------------
-function createTournament() {
-    playerCount = parseInt(document.getElementById("playerCount").value);
-    players = [];
-
-    for (let i = 0; i < playerCount; i++) {
-        players.push({
-            score: 0,
-            lives: 3,
-            name: "Gracz " + (i + 1)
-        });
-    }
-
-    currentPlayer = 0;
-    tournamentActive = true;
-
-    document.getElementById("tournamentSetup").classList.add("hidden");
-    document.getElementById("tournamentBoard").classList.remove("hidden");
-
-    updateTournamentBoard();
-    generateTask();
-}
-
-function updateTournamentBoard() {
-    let info = `<h3>Tura: ${players[currentPlayer].name}</h3>`;
-    document.getElementById("turnInfo").innerHTML = info;
-
-    let scoreList = "";
-    players.forEach(p => {
-        scoreList += `${p.name}: ${p.score} pkt • ❤️ ${p.lives}<br>`;
-    });
-    document.getElementById("playerScores").innerHTML = scoreList;
-
-    document.getElementById("livesCount").innerText = players[currentPlayer].lives;
-}
-
-function nextPlayer() {
-    currentPlayer = (currentPlayer + 1) % playerCount;
-
-    while (players[currentPlayer].lives <= 0) {
-        currentPlayer = (currentPlayer + 1) % playerCount;
-    }
-
-    updateTournamentBoard();
-}
-
-function checkTournamentAnswer(user) {
-    let p = players[currentPlayer];
-
-    if (user == correctAnswer) {
-        p.score += 3;
-        alert("🎉 Poprawnie!");
-    } else {
-        p.lives--;
-        alert("❌ Źle!");
-    }
-
-    if (p.lives <= 0) {
-        alert(`${p.name} odpada!`);
-    }
-
-    updateTournamentBoard();
-    generateTask();
-    nextPlayer();
-}
-
-//---------------------------------------------------------
-//                AKTUALIZACJA WYNIKU
-//---------------------------------------------------------
+/* ============================================================
+     WYNIKI
+============================================================ */
 function updateScore() {
     document.getElementById("p1").innerText = points;
 }
