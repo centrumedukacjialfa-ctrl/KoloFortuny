@@ -9,6 +9,23 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* PANEL WYBORU ZADAŃ */
+#taskTypePanel {
+    background: white;
+    border: 2px solid #999;
+    padding: 20px;
+    width: 40%;
+    margin: auto;
+    border-radius: 20px;
+}
+
+#taskTypePanel select {
+    font-size: 26px;
+    padding: 10px;
+    width: 80%;
+}
+
+/* KOŁO */
 #wheel-container {
     position: relative;
     width: 500px;
@@ -27,31 +44,24 @@ h1 {
     transform: translateX(-50%);
 }
 
-#spinBtn {
-    margin-top: 30px;
+/* PRZYCISKI */
+#spinBtn, #checkBtn {
     padding: 20px 50px;
     font-size: 28px;
-    background: #007bff;
-    border: none;
-    color: white;
+    margin-top: 20px;
     border-radius: 15px;
     cursor: pointer;
+    border: none;
 }
 
+#spinBtn { background: #007bff; color: white; }
+#checkBtn { background: #28a745; color: white; }
+
+/* ODPOWIEDZI */
 #answerSection input {
     font-size: 28px;
     padding: 10px;
-    width: 120px;
-}
-
-#checkBtn {
-    font-size: 26px;
-    padding: 15px 30px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
+    width: 150px;
 }
 
 #taskBox {
@@ -66,6 +76,7 @@ h1 {
     font-weight: bold;
 }
 
+/* WYNIKI */
 #scoreBoard {
     margin-top: 35px;
     font-size: 28px;
