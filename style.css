@@ -287,3 +287,57 @@ h1 {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+/* ============================
+   PANEL STATYSTYK – GRAFICZNY
+============================ */
+
+#statsPanel {
+    width: 60%;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 25px;
+    border: 3px solid #666;
+}
+
+#statsPanel h2 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #eef2ff;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 30px;
+    border: 2px solid #ccd5ff;
+}
+
+.statIcon {
+    font-size: 40px;
+}
+
+.statLabel {
+    flex: 1;
+    text-align: left;
+    margin-left: 20px;
+}
+
+#resetStatsBtn {
+    margin-top: 20px;
+    font-size: 32px;
+    padding: 15px 40px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#resetStatsBtn:hover {
+    opacity: 0.9;
+}
