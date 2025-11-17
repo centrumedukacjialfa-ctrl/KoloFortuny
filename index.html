@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Matematyczne Koło Fortuny – Szkoła Specjalna</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>🎯 Matematyczne Koło Fortuny</h1>
+
+<!-- PANEL NAUCZYCIELA -->
+<div id="teacherPanel">
+    <h2>⚙️ Panel Nauczyciela</h2>
+
+    <label>Poziom trudności:</label>
+    <select id="difficulty">
+        <option value="easy">Łatwy (1–10)</option>
+        <option value="medium">Średni (1–20)</option>
+        <option value="hard">Trudny (1–50)</option>
+    </select>
+
+    <label>Rodzaj zadań:</label>
+    <select id="taskType">
+        <option value="mix">Dodawanie i odejmowanie</option>
+        <option value="add">Tylko dodawanie</option>
+        <option value="sub">Tylko odejmowanie</option>
+    </select>
+
+    <label>Tryb gry:</label>
+    <select id="gameMode">
+        <option value="single">1 gracz</option>
+        <option value="vs">2 graczy</option>
+        <option value="to5">Gra do 5 punktów</option>
+        <option value="time">Tryb czasowy (10 sek.)</option>
+    </select>
+
+    <button id="saveSettings">Zapisz ustawienia</button>
+</div>
+
+<!-- Tryb kontrastowy -->
+<button id="contrastBtn">♿ Tryb wysoki kontrast</button>
+
+<!-- KOŁO -->
+<div id="wheel"></div>
+
+<button id="spinBtn" onclick="spinWheel()">🎡 Zakręć kołem</button>
+
+<div id="taskBox"></div>
+
+<!-- Odpowiedź -->
+<div id="answerSection" style="display:none;">
+    <div class="label">Twoja odpowiedź:</div>
+    <input type="number" id="answer">
+    <button id="checkBtn" onclick="checkAnswer()">Sprawdź</button>
+</div>
+
+<div id="result"></div>
+
+<!-- PUNKTY -->
+<div id="scoreBoard">
+    <h2>Wyniki</h2>
+    <p>Gracz 1: <span id="p1">0</span></p>
+    <p>Gracz 2: <span id="p2">0</span></p>
+</div>
+
+<!-- TRYB ĆWICZEŃ -->
+<button id="exerciseBtn">📝 Tryb ćwiczeń</button>
+
+<div id="exercisePanel" style="display:none;">
+    <h2>Tryb ćwiczeń</h2>
+    <div id="exerciseTask"></div>
+    <input type="number" id="exerciseAnswer">
+    <button onclick="checkExercise()">Sprawdź odpowiedź</button>
+    <div id="exerciseResult"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
