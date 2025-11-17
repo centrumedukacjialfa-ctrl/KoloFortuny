@@ -11,7 +11,7 @@
 <h1>🎡 Matematyczne Koło Fortuny</h1>
 
 <!-- PANEL ŻYĆ -->
-<div id="lifePanel" class="hidden">
+<div id="lifePanel">
     ❤️ <span id="livesCount">3</span>
 </div>
 
@@ -44,12 +44,12 @@
     <canvas id="wheel" width="500" height="500"></canvas>
 </div>
 
-<button id="spinBtn" class="hidden">Zakręć kołem</button>
+<button id="spinBtn">Zakręć kołem</button>
 
 <div id="taskBox"></div>
 
 <!-- ODPOWIEDŹ -->
-<div id="answerSection" class="hidden">
+<div id="answerSection">
     <div class="label">Twoja odpowiedź:</div>
     <input type="text" id="answerInput">
     <button id="checkBtn">Sprawdź</button>
@@ -58,10 +58,9 @@
 <div id="result"></div>
 
 <!-- TABLICA WYNIKÓW -->
-<div id="scoreBoard" class="hidden">
+<div id="scoreBoard">
     <h2>Wyniki</h2>
-    <p>Gracz 1: <span id="p1">0</span></p>
-    <p>Gracz 2: <span id="p2">0</span></p>
+    <p>Punkty: <span id="p1">0</span></p>
 </div>
 
 <script src="script.js"></script>
