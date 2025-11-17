@@ -2,13 +2,27 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Matematyczne Koło Fortuny – 8 segmentów</title>
+    <title>Matematyczne Koło Fortuny – Zaawansowane Zadania</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>🎡 Matematyczne Koło Fortuny</h1>
 
+<!-- WYBÓR TYPU ZADANIA -->
+<div id="taskTypePanel">
+    <h2>🧠 Wybierz typ zadania</h2>
+    <select id="taskStyleSelect">
+        <option value="classic">Klasyczne działania</option>
+        <option value="dots">Działania obrazkowe (kropki)</option>
+        <option value="story">Zadania tekstowe (historyjki)</option>
+        <option value="missing">Puste okienko</option>
+        <option value="compare">Porównywanie liczb</option>
+        <option value="mix">MIX wszystkich typów</option>
+    </select>
+</div>
+
+<!-- KOŁO -->
 <div id="wheel-container">
     <div id="arrow"></div>
     <canvas id="wheel" width="500" height="500"></canvas>
@@ -18,14 +32,16 @@
 
 <div id="taskBox"></div>
 
+<!-- ODPOWIEDŹ -->
 <div id="answerSection" style="display:none;">
     <div class="label">Twoja odpowiedź:</div>
-    <input type="number" id="answerInput">
+    <input type="text" id="answerInput">
     <button id="checkBtn">Sprawdź</button>
 </div>
 
 <div id="result"></div>
 
+<!-- PUNKTY -->
 <div id="scoreBoard">
     <h2>Wyniki</h2>
     <p>Gracz 1: <span id="p1">0</span></p>
