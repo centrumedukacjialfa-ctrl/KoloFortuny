@@ -3,6 +3,12 @@
 // ===========================================
 // GLOBALNE ZMIENNE I STRUKTURA GRY
 // ===========================================
+// Dźwięki
+const sndSpin = document.getElementById("sndSpin");
+const sndCorrect = document.getElementById("sndCorrect");
+const sndWrong = document.getElementById("sndWrong");
+const sndBeep = document.getElementById("sndBeep");
+const sndAlarm = document.getElementById("sndAlarm");
 
 let gameMode = null;       
 // "mission", "time", "tournament", "points", "endless"
