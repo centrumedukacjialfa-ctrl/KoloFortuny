@@ -11,6 +11,42 @@
 <audio id="sndWrong" src="wrong.wav"></audio>
 <audio id="sndBeep" src="beep.wav"></audio>
 <audio id="sndAlarm" src="alarm.wav"></audio>
+<!-- PANEL STATYSTYK -->
+<div id="statsPanel" class="hidden">
+    <h2>📊 Statystyki ucznia</h2>
+
+    <div class="statItem">
+        <span class="statIcon">⭐</span>
+        <span class="statLabel">Ukończone misje:</span>
+        <span id="statMissions">0</span>
+    </div>
+
+    <div class="statItem">
+        <span class="statIcon">🏆</span>
+        <span class="statLabel">Rekord punktów:</span>
+        <span id="statBestScore">0</span>
+    </div>
+
+    <div class="statItem">
+        <span class="statIcon">🔥</span>
+        <span class="statLabel">Najdłuższa seria:</span>
+        <span id="statBestStreak">0</span>
+    </div>
+
+    <div class="statItem">
+        <span class="statIcon">✔</span>
+        <span class="statLabel">Poprawne odpowiedzi:</span>
+        <span id="statCorrect">0</span>
+    </div>
+
+    <div class="statItem">
+        <span class="statIcon">❌</span>
+        <span class="statLabel">Błędne odpowiedzi:</span>
+        <span id="statWrong">0</span>
+    </div>
+
+    <button id="resetStatsBtn" onclick="resetStats()">🔄 Resetuj statystyki</button>
+</div>
 
 <body>
 
