@@ -1,35 +1,133 @@
+/* =========================================
+   PODSTAWOWY STYL
+========================================= */
+
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
-    background: #f5f5f5;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
-    font-size: 48px;
+    font-size: 52px;
+    margin-top: 20px;
+}
+
+/* Ukrywanie elementów */
+.hidden {
+    display: none;
+}
+
+/* =========================================
+   PANEL TRYBÓW GRY
+========================================= */
+
+#modePanel {
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #999;
+}
+
+#modePanel h2 {
+    font-size: 36px;
     margin-bottom: 20px;
 }
 
-/* PANEL WYBORU ZADAŃ */
-#taskTypePanel {
-    background: white;
-    border: 2px solid #999;
+.modeBtn {
+    width: 80%;
     padding: 20px;
-    width: 40%;
-    margin: auto;
+    font-size: 30px;
+    margin: 10px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    background: #4da6ff;
+    color: white;
+}
+
+.modeBtn:hover {
+    opacity: 0.9;
+}
+
+/* =========================================
+   MISJE – GWIAZDKI
+========================================= */
+
+#missionPanel {
+    width: 50%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #999;
+}
+
+#missionPanel h2 {
+    font-size: 40px;
+}
+
+#missionStars {
+    font-size: 50px;
+    margin-top: 10px;
+}
+
+/* =========================================
+   PANEL USTAWIEŃ TURNIEJU I CELU
+========================================= */
+
+#tournamentSetup,
+#pointsSetup {
+    width: 50%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #888;
     border-radius: 20px;
 }
 
-#taskTypePanel select {
-    font-size: 26px;
+#tournamentSetup input,
+#pointsSetup input {
+    font-size: 30px;
     padding: 10px;
-    width: 80%;
+    width: 120px;
+    margin-top: 10px;
 }
 
-/* KOŁO */
+#tournamentSetup button,
+#pointsSetup button {
+    margin-top: 15px;
+    font-size: 28px;
+    padding: 15px 40px;
+    background: #34c759;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* =========================================
+   TRYB CZASOWY – LICZNIK
+========================================= */
+
+#timer {
+    font-size: 50px;
+    color: red;
+    margin-top: 20px;
+}
+
+/* =========================================
+   KOŁO FORTUNY
+========================================= */
+
 #wheel-container {
     position: relative;
     width: 500px;
-    margin: auto;
+    margin: 20px auto;
 }
 
 #arrow {
@@ -44,40 +142,86 @@ h1 {
     transform: translateX(-50%);
 }
 
-/* PRZYCISKI */
-#spinBtn, #checkBtn {
+/* =========================================
+   PRZYCISKI
+========================================= */
+
+#spinBtn {
     padding: 20px 50px;
-    font-size: 28px;
-    margin-top: 20px;
+    font-size: 32px;
+    background: #007aff;
+    color: white;
+    border: none;
     border-radius: 15px;
     cursor: pointer;
-    border: none;
+    margin-top: 10px;
 }
 
-#spinBtn { background: #007bff; color: white; }
-#checkBtn { background: #28a745; color: white; }
+#checkBtn {
+    padding: 15px 40px;
+    font-size: 30px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
 
-/* ODPOWIEDZI */
+/* =========================================
+   ZADANIA – WYŚWIETLANIE
+========================================= */
+
+#taskBox {
+    margin-top: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    min-height: 80px;
+}
+
+#answerSection {
+    margin-top: 15px;
+}
+
 #answerSection input {
-    font-size: 28px;
+    font-size: 32px;
     padding: 10px;
     width: 150px;
 }
 
-#taskBox {
-    margin-top: 20px;
-    font-size: 36px;
-    font-weight: bold;
-}
+/* =========================================
+   WYNIK
+========================================= */
 
 #result {
-    margin-top: 20px;
     font-size: 32px;
+    margin-top: 20px;
     font-weight: bold;
 }
 
-/* WYNIKI */
+/* =========================================
+   TABLICE WYNIKÓW
+========================================= */
+
 #scoreBoard {
-    margin-top: 35px;
-    font-size: 28px;
+    margin-top: 30px;
+    font-size: 30px;
+}
+
+#tournamentTable {
+    width: 60%;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px solid #777;
+}
+
+#tournamentTable h2 {
+    font-size: 36px;
+}
+
+#tournamentList {
+    font-size: 30px;
+    margin-top: 10px;
+    text-align: left;
 }
