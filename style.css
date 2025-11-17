@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f7faff;
+    text-align: center;
+    padding-top: 20px;
+}
+
+body.contrast {
+    background: black;
+    color: yellow;
+}
+
+h1 {
+    font-size: 48px;
+}
+
+/* KOŁO */
+#wheel {
+    width: 300px;
+    height: 300px;
+    border: 15px solid #444;
+    border-radius: 50%;
+    margin: auto;
+    background: conic-gradient(
+        blue 0deg 90deg,
+        green 90deg 180deg,
+        yellow 180deg 270deg,
+        red 270deg 360deg
+    );
+    transition: transform 4s ease-out;
+    cursor: pointer;
+}
+
+/* BUTTONY */
+button {
+    font-size: 28px;
+    padding: 20px 40px;
+    margin: 15px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    background: #4da6ff;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* PANEL NAUCZYCIELA */
+#teacherPanel {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 25px;
+    width: 70%;
+    margin: auto;
+    border: 2px solid #999;
+}
+
+#teacherPanel select {
+    font-size: 24px;
+    margin: 10px;
+}
+
+/* WYNIKI */
+#scoreBoard {
+    margin-top: 25px;
+    font-size: 32px;
+}
+
+/* ODPOWIEDŹ */
+#answerSection input {
+    font-size: 34px;
+    padding: 10px;
+    width: 150px;
+}
+
+/* TRYB ĆWICZEŃ */
+#exercisePanel {
+    margin-top: 30px;
+    padding: 20px;
+    background: #e3f2ff;
+    border-radius: 20px;
+    font-size: 32px;
+}
