@@ -1,133 +1,67 @@
-/* =========================================
-   PODSTAWOWY STYL
-========================================= */
-
 body {
-    font-family: Arial, sans-serif;
     text-align: center;
-    background: #f3f4f6;
-    margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
 }
 
 h1 {
-    font-size: 52px;
-    margin-top: 20px;
+    font-size: 50px;
 }
 
-/* Ukrywanie elementów */
 .hidden {
     display: none;
 }
 
-/* =========================================
-   PANEL TRYBÓW GRY
-========================================= */
-
-#modePanel {
-    width: 60%;
-    margin: 20px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 20px;
-    border: 2px solid #999;
-}
-
-#modePanel h2 {
-    font-size: 36px;
-    margin-bottom: 20px;
-}
-
 .modeBtn {
-    width: 80%;
-    padding: 20px;
-    font-size: 30px;
     margin: 10px;
-    border: none;
-    border-radius: 15px;
+    padding: 15px 40px;
+    font-size: 30px;
     cursor: pointer;
-    background: #4da6ff;
-    color: white;
+    border-radius: 15px;
+    border: 2px solid #333;
 }
 
-.modeBtn:hover {
-    opacity: 0.9;
+#lifePanel {
+    font-size: 40px;
+    margin-bottom: 15px;
 }
 
-/* =========================================
-   MISJE – GWIAZDKI
-========================================= */
-
-#missionPanel {
-    width: 50%;
+#missionPanel,
+#modePanel,
+#scoreBoard {
     margin: 20px auto;
     padding: 20px;
+    width: 50%;
     background: white;
     border-radius: 20px;
-    border: 2px solid #999;
+    border: 2px solid #777;
 }
 
-#missionPanel h2 {
+#taskBox {
     font-size: 40px;
-}
-
-#missionStars {
-    font-size: 50px;
-    margin-top: 10px;
-}
-
-/* =========================================
-   PANEL USTAWIEŃ TURNIEJU I CELU
-========================================= */
-
-#tournamentSetup,
-#pointsSetup {
-    width: 50%;
-    margin: 20px auto;
-    padding: 20px;
-    background: #ffffff;
-    border: 2px solid #888;
-    border-radius: 20px;
-}
-
-#tournamentSetup input,
-#pointsSetup input {
-    font-size: 30px;
-    padding: 10px;
-    width: 120px;
-    margin-top: 10px;
-}
-
-#tournamentSetup button,
-#pointsSetup button {
-    margin-top: 15px;
-    font-size: 28px;
-    padding: 15px 40px;
-    background: #34c759;
-    border: none;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-/* =========================================
-   TRYB CZASOWY – LICZNIK
-========================================= */
-
-#timer {
-    font-size: 50px;
-    color: red;
     margin-top: 20px;
 }
 
-/* =========================================
-   KOŁO FORTUNY
-========================================= */
+#answerSection {
+    margin-top: 20px;
+}
+
+#answerInput {
+    font-size: 30px;
+    width: 150px;
+    text-align: center;
+}
+
+#checkBtn {
+    font-size: 22px;
+    padding: 10px 20px;
+}
 
 #wheel-container {
+    margin: 20px auto;
     position: relative;
     width: 500px;
-    margin: 20px auto;
+    height: 500px;
 }
 
 #arrow {
@@ -135,209 +69,9 @@ h1 {
     height: 0;
     border-left: 25px solid transparent;
     border-right: 25px solid transparent;
-    border-bottom: 40px solid black;
+    border-bottom: 40px solid red;
     position: absolute;
     top: -40px;
     left: 50%;
     transform: translateX(-50%);
-}
-
-/* =========================================
-   PRZYCISKI
-========================================= */
-
-#spinBtn {
-    padding: 20px 50px;
-    font-size: 32px;
-    background: #007aff;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-#checkBtn {
-    padding: 15px 40px;
-    font-size: 30px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-}
-
-/* =========================================
-   ZADANIA – WYŚWIETLANIE
-========================================= */
-
-#taskBox {
-    margin-top: 20px;
-    font-size: 40px;
-    font-weight: bold;
-    min-height: 80px;
-}
-
-#answerSection {
-    margin-top: 15px;
-}
-
-#answerSection input {
-    font-size: 32px;
-    padding: 10px;
-    width: 150px;
-}
-
-/* =========================================
-   WYNIK
-========================================= */
-
-#result {
-    font-size: 32px;
-    margin-top: 20px;
-    font-weight: bold;
-}
-
-/* =========================================
-   TABLICE WYNIKÓW
-========================================= */
-
-#scoreBoard {
-    margin-top: 30px;
-    font-size: 30px;
-}
-
-#tournamentTable {
-    width: 60%;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    border: 2px solid #777;
-}
-
-#tournamentTable h2 {
-    font-size: 36px;
-}
-
-#tournamentList {
-    font-size: 30px;
-    margin-top: 10px;
-    text-align: left;
-}
-/* ============================
-   ANIMACJE – ETAP 5
-============================ */
-
-/* A — DRŻENIE KOŁA */
-.wheel-shake {
-    animation: shakeWheel 0.5s ease-in-out;
-}
-
-@keyframes shakeWheel {
-    0% { transform: rotate(0deg) translateX(0); }
-    20% { transform: rotate(1deg) translateX(-3px); }
-    40% { transform: rotate(-1deg) translateX(3px); }
-    60% { transform: rotate(1deg) translateX(-3px); }
-    80% { transform: rotate(-1deg) translateX(3px); }
-    100% { transform: rotate(0deg) translateX(0); }
-}
-
-/* B — BŁYSK POPRAWNEJ ODPOWIEDZI */
-.correct-flash {
-    animation: correctFlash 0.6s ease-out;
-}
-
-@keyframes correctFlash {
-    0% { background: #00ff00; }
-    100% { background: transparent; }
-}
-
-/* C — WSTRZĄS PRZY BŁĘDZIE */
-.wrong-shake {
-    animation: wrongShake 0.4s ease-in-out;
-}
-
-@keyframes wrongShake {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-10px); }
-    80% { transform: translateX(10px); }
-    100% { transform: translateX(0); }
-}
-
-/* D — ANIMOWANE GWIAZDKI W MISJACH */
-.mission-star-animate {
-    animation: starPop 0.5s ease-out;
-}
-
-@keyframes starPop {
-    0% { transform: scale(0.4); opacity: 0; }
-    80% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); }
-}
-
-/* E — PŁYNNE POJAWIANIE SIĘ ZADAŃ */
-.task-fade {
-    animation: fadeInTask 0.5s ease-out;
-}
-
-@keyframes fadeInTask {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-/* ============================
-   PANEL STATYSTYK – GRAFICZNY
-============================ */
-
-#statsPanel {
-    width: 60%;
-    margin: 30px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 25px;
-    border: 3px solid #666;
-}
-
-#statsPanel h2 {
-    font-size: 40px;
-    margin-bottom: 20px;
-}
-
-.statItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #eef2ff;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 15px;
-    font-size: 30px;
-    border: 2px solid #ccd5ff;
-}
-
-.statIcon {
-    font-size: 40px;
-}
-
-.statLabel {
-    flex: 1;
-    text-align: left;
-    margin-left: 20px;
-}
-
-#resetStatsBtn {
-    margin-top: 20px;
-    font-size: 32px;
-    padding: 15px 40px;
-    background: #ff4d4f;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-}
-
-#resetStatsBtn:hover {
-    opacity: 0.9;
 }
