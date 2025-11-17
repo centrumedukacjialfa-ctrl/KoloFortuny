@@ -2,126 +2,97 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Koło Fortuny – Matematyka + Informatyka + Teleturniej</title>
+    <title>Matematyczne Koło Fortuny – Mega Wersja</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1 id="title">🎡 Koło Fortuny – Matematyka + Informatyka + Teleturniej</h1>
+<h1>🎡 Mega Teleturniej – Matematyka + Informatyka</h1>
 
 <!-- PANEL ŻYĆ -->
-<div id="lifePanel">
+<div id="lifePanel" class="hidden">
     ❤️ <span id="livesCount">3</span>
 </div>
 
-<!-- PANEL TRYBÓW GRY -->
+<!-- PANEL TRYBÓW -->
 <div id="modePanel">
     <h2>Wybierz tryb gry</h2>
 
-    <button class="modeBtn" onclick="startMissionMode()">⭕ Misje</button>
-    <button class="modeBtn" onclick="startTimeMode()">⏱ Tryb czasowy</button>
-    <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej matematyczny</button>
-    <button class="modeBtn" onclick="startPointsMode()">⭐ Gra do X punktów</button>
-    <button class="modeBtn" onclick="startEndlessMode()">♾ Tryb nieskończony</button>
-
-    <!-- TRYB INFORMATYKA -->
+    <button class="modeBtn" onclick="startMathMode()">🔢 Matematyka</button>
     <button class="modeBtn" onclick="startITMode()">🖥 Informatyka</button>
-
-    <!-- TELETURNIEJ JEDNOOSOBOWY -->
-    <button class="modeBtn" onclick="startITQuiz()">🎤 Teleturniej Informatyki</button>
-
-    <!-- NOWOŚĆ: TELETURNIEJ WIELOOSOBOWY -->
-    <button class="modeBtn" onclick="startQuizTournament()">🎤 Teleturniej – wielu graczy</button>
+    <button class="modeBtn" onclick="startMissionMode()">⭕ Misje</button>
+    <button class="modeBtn" onclick="startTimeMode()">⏱ Czasowy (10s)</button>
+    <button class="modeBtn" onclick="startEndlessMode()">♾ Nieskończony</button>
+    <button class="modeBtn" onclick="startPointsMode()">⭐ Do X punktów</button>
+    <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej matematyczny</button>
+    <button class="modeBtn" onclick="startQuizTournament()">🎤 Teleturniej ABC (informatyka)</button>
 </div>
 
-<!-- MISJE -->
-<div id="missionPanel" class="panel hidden">
-    <h2>🗺 Misja <span id="missionNumber">1</span></h2>
-    <p id="missionDesc">Wykonaj 5 zadań poprawnie.</p>
-    <button onclick="startMission()">▶ Start misji</button>
+<!-- ===== MISJE ===== -->
+<div id="missionPanel" class="hidden panel">
+    <h2>🗺 Misja</h2>
+    <p id="missionDesc"></p>
+    <button class="modeBtn" onclick="startMission()">Start misji</button>
 </div>
 
-<!-- TURNIEJ MATEMATYCZNY -->
-<div id="tournamentSetup" class="panel hidden">
+<!-- ===== TRYB TURNIEJU MATEMATYCZNEGO ===== -->
+<div id="tournamentSetup" class="hidden panel">
     <h2>Turniej matematyczny</h2>
-    <p>Liczba graczy (2–10):</p>
-    <input id="playerCount" type="number" min="2" max="10" value="2">
-    <button onclick="createTournament()">Start turnieju</button>
+    <label>Liczba graczy:</label>
+    <input id="playerCount" type="number" value="2" min="2" max="10">
+    <button class="modeBtn" onclick="createTournament()">Start</button>
 </div>
 
-<div id="tournamentBoard" class="panel hidden">
-    <h2>Turniej</h2>
+<div id="tournamentBoard" class="hidden panel">
     <div id="turnInfo"></div>
+    <h3>Wyniki graczy</h3>
     <div id="playerScores"></div>
 </div>
 
-<!-- TURNIEJ INFORMATYCZNY (TELETURNIEJ) – wieloosobowy -->
-<div id="quizTournamentSetup" class="panel hidden">
-    <h2>🎤 Teleturniej Informatyki – Wiele osób</h2>
-    <p>Liczba graczy (2–10):</p>
-    <input id="quizTournamentCount" type="number" min="2" max="10" value="2">
-    <button onclick="startQuizTournamentGame()">Start</button>
+<!-- ===== TELETURNIEJ ABC ===== -->
+<div id="quizTournamentSetup" class="hidden panel">
+    <h2>🎤 Teleturniej Informatyczny</h2>
+    <p>Podaj liczbę graczy:</p>
+    <input id="quizTournamentCount" type="number" value="2" min="2" max="10">
+    <button class="modeBtn" onclick="startQuizTournamentGame()">Start teleturnieju</button>
 </div>
 
-<div id="quizTournamentBoard" class="panel hidden">
-    <h2>Teleturniej – Aktualny gracz</h2>
+<div id="quizTournamentBoard" class="hidden panel">
     <div id="quizTurnInfo"></div>
     <div id="quizPlayersBoard"></div>
 </div>
 
-<!-- TIMER -->
-<div id="timer" class="hidden">
-    ⏱ <span id="timeLeft">10</span> s
-</div>
-
-<!-- STATYSTYKI -->
-<div id="statsPanel" class="panel hidden">
-    <h2>📊 Statystyki i Osiągnięcia</h2>
-
-    <p>Najwyższy wynik: <span id="statBestScore">0</span></p>
-    <p>Najdłuższa seria: <span id="statBestStreak">0</span></p>
-    <p>Gier rozegranych: <span id="statGames">0</span></p>
-    <p>Poprawnych odpowiedzi: <span id="statCorrect">0</span></p>
-    <p>Błędnych odpowiedzi: <span id="statWrong">0</span></p>
-
-    <h3>🏅 Osiągnięcia</h3>
-    <div id="achievements"></div>
-
-    <button onclick="resetStats()">🔄 Resetuj statystyki</button>
-</div>
-
-<!-- KOŁO FORTUNY -->
-<div id="wheel-container">
-    <canvas id="wheel" width="600" height="600"></canvas>
-    <div id="arrow"></div>
-</div>
-
-<button id="spinBtn">Zakręć kołem</button>
-
-<!-- ZADANIA -->
-<div id="taskBox"></div>
-
-<!-- ODPOWIEDŹ (MATEMATYKA + INFORMATYKA) -->
-<div id="answerSection">
-    <div class="label">Twoja odpowiedź:</div>
-    <input type="text" id="answerInput">
-    <button id="checkBtn">Sprawdź</button>
-</div>
-
-<!-- TELETURNIEJ KOŁA RATUNKOWE -->
+<!-- ===== KOŁA RATUNKOWE ===== -->
 <div id="lifelines" class="hidden">
     <button id="phoneBtn" class="lifeBtn" onclick="usePhone()">📞 Telefon</button>
     <button id="publicBtn" class="lifeBtn" onclick="usePublic()">👥 Publiczność</button>
     <button id="halfBtn" class="lifeBtn" onclick="use5050()">➗ 50/50</button>
 </div>
 
-<!-- TELETURNIEJ – ODPOWIEDZI ABC -->
+<!-- ===== PANELE ZADAŃ ===== -->
+<div id="timer" class="hidden">
+    ⏱ <span id="timeLeft">10</span>s
+</div>
+
+<div id="taskBox" class="hidden"></div>
+
+<div id="answerSection" class="hidden">
+    <input id="answerInput" type="text">
+    <button id="checkBtn">Sprawdź</button>
+</div>
+
 <div id="quizAnswers" class="hidden"></div>
 
-<!-- PANEL WYNIKÓW -->
-<div id="scoreBoard" class="panel hidden">
-    <h2>Wyniki</h2>
+<!-- ===== KOŁO FORTUNY ===== -->
+<div id="wheel-container">
+    <div id="arrow"></div>
+    <canvas id="wheel" width="600" height="600"></canvas>
+</div>
+<button id="spinBtn" class="hidden">Zakręć kołem</button>
+
+<!-- ===== WYNIKI ===== -->
+<div id="scoreBoard" class="hidden panel">
     <p>Punkty: <span id="p1">0</span></p>
 </div>
 
