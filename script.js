@@ -9,6 +9,8 @@ let lives = 3;
 let points = 0;
 let combo = 0;
 let correctAnswer = 0;
+let currentMode = "math"; // math / it
+
 let skipTurn = false;
 let doubleTask = false;
 let superMode = false;
@@ -187,7 +189,7 @@ function handleSegment(s) {
     if (s.type === "points") {
         points += s.value;
         updateScore();
-        generateTask();
+        generateTaskMode();
         return;
     }
 
@@ -200,28 +202,28 @@ function handleSegment(s) {
     if (s.type === "double") {
         doubleTask = true;
         alert("🎯 Podwójne zadanie!");
-        generateTask();
+        generateTaskMode();
         return;
     }
 
     if (s.type === "freeze") {
         skipTurn = true;
         alert("❄ Zamrożenie! Omijasz następną kolejkę.");
-        generateTask();
+        generateTaskMode();
         return;
     }
 
     if (s.type === "bomb") {
         alert("💣 BOMBA! Tracisz 1 życie.");
         loseLife();
-        generateTask();
+        generateTaskMode();
         return;
     }
 
     if (s.type === "back") {
         alert("↩ Cofnij turę!");
         if (tournamentActive) previousPlayer();
-        generateTask();
+        generateTaskMode();
         return;
     }
 
@@ -249,7 +251,7 @@ function handleSegment(s) {
 /* ============================================================
      ZADANIA MATEMATYCZNE
 ============================================================ */
-function generateTask() {
+function generateMathTask() {
     if (skipTurn) {
         alert("❄ Pominięto kolejkę!");
         skipTurn = false;
@@ -296,6 +298,36 @@ function generateTextTask() {
             `${name} miał(a) ${a} ${item}. Oddał(a) ${b}. Ile zostało?`;
     }
 }
+/* ============================================================
+     ZADANIA INFORMATYCZNE
+============================================================ */
+const itTasks = [
+    { q: "Jak nazywa się urządzenie, którym piszemy litery?", a: "klawiatura" },
+    { q: "Jak nazywa się urządzenie, którym poruszamy po ekranie?", a: "mysz" },
+    { q: "Jak nazywa się obrazek na pulpicie?", a: "ikona" },
+    { q: "Jak nazywa się program do rysowania w Windows?", a: "paint" },
+    { q: "Gdzie zapisujemy pliki? W ...", a: "folderze" },
+    { q: "Jak nazywa się przenośny komputer?", a: "laptop" },
+    { q: "Jak nazywa się komputer w dużej obudowie?", a: "stacjonarny" },
+    { q: "Czego używamy do słuchania dźwięków?", a: "głośników" },
+    { q: "Czego używamy do mówienia do komputera?", a: "mikrofonu" },
+    { q: "Program do pisania tekstu to ...?", a: "edytor tekstu" }
+];
+
+function generateITTask() {
+    let t = itTasks[Math.floor(Math.random() * itTasks.length)];
+    document.getElementById("taskBox").innerHTML =
+        "🖥 Informatyka:<br><br>" + t.q;
+    correctAnswer = t.a.toLowerCase();
+}
+
+/* ============================================================
+     WYBÓR TRYBU: MATH / IT
+============================================================ */
+function generateTaskMode() {
+    if (currentMode === "math") generateMathTask();
+    else generateITTask();
+}
 
 /* ============================================================
      KOMBO
@@ -336,16 +368,16 @@ function resetLives() {
 document.getElementById("checkBtn").onclick = checkAnswer;
 
 function checkAnswer() {
-    let user = document.getElementById("answerInput").value;
+    let user = document.getElementById("answerInput").value.trim().toLowerCase();
 
     if (tournamentActive) {
         checkTournamentAnswer(user);
         return;
     }
 
+    // POPRAWNA
     if (user == correctAnswer) {
         points += superMode ? 10 : 1;
-
         stats.correct++;
 
         if (superMode) grantAchievement("SUPER zadanie rozwiązane");
@@ -356,19 +388,20 @@ function checkAnswer() {
         if (combo > stats.bestStreak) stats.bestStreak = combo;
 
         updateScore();
-        generateTask();
-    } else {
+        generateTaskMode();
+    }
+    // BŁĘDNA
+    else {
         stats.wrong++;
-
         addMistake(document.getElementById("taskBox").innerText, correctAnswer);
 
-        points -= superMode ? 5 : 0;
+        if (superMode) points -= 5;
         superMode = false;
 
         loseLife();
         resetCombo();
         updateScore();
-        generateTask();
+        generateTaskMode();
     }
 
     if (points > stats.bestScore) stats.bestScore = points;
@@ -377,7 +410,7 @@ function checkAnswer() {
 }
 
 /* ============================================================
-     POWTÓRKI
+     BŁĘDY / POWTÓRKI
 ============================================================ */
 function addMistake(task, answer) {
     mistakes.push(`${task} = ${answer}`);
@@ -406,15 +439,17 @@ function createTournament() {
     document.getElementById("tournamentBoard").classList.remove("hidden");
 
     updateTournamentPanel();
-    generateTask();
+    generateTaskMode();
 }
 
 function updateTournamentPanel() {
-    let info = `<h3>Tura: ${players[currentPlayer].name}</h3>`;
-    document.getElementById("turnInfo").innerHTML = info;
+    document.getElementById("turnInfo").innerHTML =
+        `<h3>Tura: ${players[currentPlayer].name}</h3>`;
 
     let list = "";
-    players.forEach(p => list += `${p.name}: ${p.score} pkt • ❤️ ${p.lives}<br>`);
+    players.forEach(p => {
+        list += `${p.name}: ${p.score} pkt • ❤️ ${p.lives}<br>`;
+    });
     document.getElementById("playerScores").innerHTML = list;
 
     document.getElementById("livesCount").innerText = players[currentPlayer].lives;
@@ -423,6 +458,7 @@ function updateTournamentPanel() {
 function nextPlayer() {
     currentPlayer = (currentPlayer + 1) % playerCount;
 
+    // pomijamy graczy martwych
     while (players[currentPlayer].lives <= 0) {
         currentPlayer = (currentPlayer + 1) % playerCount;
     }
@@ -451,7 +487,7 @@ function checkTournamentAnswer(user) {
     }
 
     updateTournamentPanel();
-    generateTask();
+    generateTaskMode();
     nextPlayer();
 }
 
@@ -468,33 +504,48 @@ function hideAllPanels() {
 
 function startMissionMode() {
     hideAllPanels();
-    document.getElementById("missionPanel").classList.remove("hidden");
     resetLives();
     points = 0;
-    generateTask();
+    currentMode = "math";
+    document.getElementById("missionPanel").classList.remove("hidden");
 }
 
 function startMission() {
     resetLives();
     points = 0;
-    generateTask();
+    currentMode = "math";
+    generateTaskMode();
 }
 
 function startPointsMode() {
     hideAllPanels();
     resetLives();
     points = 0;
-    generateTask();
+    currentMode = "math";
+    generateTaskMode();
 }
 
 function startEndlessMode() {
     hideAllPanels();
     resetLives();
     points = 0;
-    generateTask();
+    currentMode = "math";
+    generateTaskMode();
 }
 
-/* TRYB CZASOWY */
+function startITMode() {
+    hideAllPanels();
+    resetLives();
+    points = 0;
+    currentMode = "it";
+
+    alert("🖥 Tryb INFORMATYKA – odpowiadaj na pytania o komputerach!");
+    generateTaskMode();
+}
+
+/* ============================================================
+     TRYB CZASOWY
+============================================================ */
 let timerInterval = null;
 
 function startTimeMode() {
@@ -503,9 +554,10 @@ function startTimeMode() {
 
     resetLives();
     points = 0;
+    currentMode = "math";
 
     startTimer();
-    generateTask();
+    generateTaskMode();
 }
 
 function startTimer() {
@@ -521,7 +573,7 @@ function startTimer() {
         if (timeLeft <= 0) {
             loseLife();
             startTimer();
-            generateTask();
+            generateTaskMode();
         }
     }, 1000);
 }
