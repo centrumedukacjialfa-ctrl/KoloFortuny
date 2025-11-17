@@ -2,13 +2,13 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Matematyczne Koło Fortuny — Wersja TV</title>
+    <title>Koło Fortuny – Matematyka + Informatyka (TV)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1 id="title">🎡 Matematyczne Koło Fortuny — Wersja TV</h1>
+<h1 id="title">🎡 Koło Fortuny – Matematyka + Informatyka</h1>
 
 <!-- PANEL ŻYĆ -->
 <div id="lifePanel">
@@ -23,17 +23,20 @@
     <button class="modeBtn" onclick="startTimeMode()">⏱ Tryb czasowy</button>
     <button class="modeBtn" onclick="startTournamentMode()">👥 Turniej</button>
     <button class="modeBtn" onclick="startPointsMode()">⭐ Gra do X punktów</button>
-    <button class="modeBtn" onclick="startEndlessMode()">♾ Tryb nieskończony</button>
+    <button class="modeBtn" onclick="startEndlessMode()">♾ Nieskończony</button>
+
+    <!-- NOWOŚĆ -->
+    <button class="modeBtn" onclick="startITMode()">🖥 Informatyka</button>
 </div>
 
-<!-- PANEL MISJI -->
+<!-- MISJE -->
 <div id="missionPanel" class="panel hidden">
     <h2>🗺 Misja <span id="missionNumber">1</span></h2>
     <p id="missionDesc">Wykonaj 5 zadań poprawnie.</p>
     <button onclick="startMission()">▶ Start misji</button>
 </div>
 
-<!-- PANEL TURNIEJOWY — konfiguracja -->
+<!-- TRYB TURNIEJOWY -->
 <div id="tournamentSetup" class="panel hidden">
     <h2>Tryb turniejowy</h2>
     <p>Liczba graczy (2–10):</p>
@@ -41,19 +44,18 @@
     <button onclick="createTournament()">Start turnieju</button>
 </div>
 
-<!-- PANEL TURNIEJU -->
 <div id="tournamentBoard" class="panel hidden">
     <h2>Turniej</h2>
     <div id="turnInfo"></div>
     <div id="playerScores"></div>
 </div>
 
-<!-- LICZNIK CZASU -->
+<!-- TIMER -->
 <div id="timer" class="hidden">
     ⏱ <span id="timeLeft">10</span> s
 </div>
 
-<!-- PANEL OSIĄGNIĘĆ / RANKINGÓW -->
+<!-- STATYSTYKI -->
 <div id="statsPanel" class="panel hidden">
     <h2>📊 Statystyki i Osiągnięcia</h2>
 
@@ -69,7 +71,7 @@
     <button onclick="resetStats()">🔄 Resetuj statystyki</button>
 </div>
 
-<!-- NOWE KOŁO FORTUNY — WERSJA TV -->
+<!-- KOŁO -->
 <div id="wheel-container">
     <canvas id="wheel" width="600" height="600"></canvas>
     <div id="arrow"></div>
@@ -87,7 +89,7 @@
     <button id="checkBtn">Sprawdź</button>
 </div>
 
-<!-- TABLICA WYNIKÓW -->
+<!-- WYNIKI -->
 <div id="scoreBoard" class="panel hidden">
     <h2>Wyniki</h2>
     <p>Punkty: <span id="p1">0</span></p>
