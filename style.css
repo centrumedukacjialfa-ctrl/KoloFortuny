@@ -1,221 +1,209 @@
 /* =========================================
-   RESET
+   GLOBAL
 ========================================= */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+body {
+    background: #222;
+    color: #fff;
     font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding-bottom: 50px;
 }
 
-body {
-    background: linear-gradient(#d9eaff, #aecdff);
-    text-align: center;
-    padding-bottom: 40px;
+h1, h2 {
+    text-shadow: 0 0 10px #000;
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
-/* =========================================
-   NAGŁÓWEK
-========================================= */
-h1#title {
-    margin-top: 20px;
-    font-size: 48px;
-    font-weight: bold;
-    color: #003d99;
-    text-shadow: 2px 2px 4px #ffffff;
-}
-
-/* =========================================
-   TRYBY GRY
-========================================= */
-#modePanel {
-    margin-top: 20px;
+.panel {
+    background: #333;
     padding: 20px;
+    margin: 20px auto;
+    width: 500px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #000;
 }
+
+/* =========================================
+   TRYBY GRY – PRZYCISKI
+========================================= */
 
 .modeBtn {
-    padding: 20px 30px;
+    background: #444;
+    color: white;
+    border: 2px solid #777;
+    padding: 12px 20px;
+    font-size: 22px;
     margin: 10px;
-    font-size: 26px;
-    border-radius: 20px;
-    border: 3px solid #1653c3;
-    background: #e8f0ff;
+    border-radius: 10px;
     cursor: pointer;
-    transition: 0.25s;
+    width: 280px;
+    transition: 0.2s;
 }
 
 .modeBtn:hover {
-    background: #c7ddff;
+    background: #666;
     transform: scale(1.05);
 }
 
-/* =========================================
-   PANELS (Misje, Turniej, Statystyki)
-========================================= */
-.panel {
-    margin: 20px auto;
-    padding: 25px;
-    width: 500px;
-    background: #ffffffcc;
-    border-radius: 25px;
-    border: 3px solid #1f3e8b;
-    box-shadow: 0 0 15px #7aa2ff;
+.lifeBtn {
+    background: #5533aa;
+    color: white;
+    border: 2px solid #aa88ff;
+    padding: 10px 15px;
+    font-size: 20px;
+    margin: 10px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
-/* =========================================
-   ŻYCIA
-========================================= */
-#lifePanel {
-    font-size: 32px;
-    margin: 20px;
-    color: #d80000;
-    font-weight: bold;
+.lifeBtn.used {
+    background: #222;
+    border-color: #555;
+    opacity: 0.4;
+    cursor: default;
 }
 
 /* =========================================
    KOŁO FORTUNY
 ========================================= */
+
 #wheel-container {
     position: relative;
+    margin: 20px auto;
     width: 600px;
     height: 600px;
-    margin: 20px auto;
 }
 
-#wheel {
-    border-radius: 50%;
-    box-shadow: 0 0 20px #00000055, inset 0 0 20px #ffffff66;
-}
-
-/* STRZAŁKA */
 #arrow {
     position: absolute;
-    top: -10px;
+    top: -15px;
     left: 50%;
+    margin-left: -20px;
     width: 0;
     height: 0;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
-    border-bottom: 60px solid #ff0000;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 0 5px #000);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 40px solid yellow;
+    z-index: 10;
 }
 
-/* =========================================
-   PRZYCISK KRĘCENIA
-========================================= */
 #spinBtn {
-    padding: 20px 40px;
-    font-size: 32px;
-    background: #fff1b3;
-    border-radius: 20px;
-    border: 4px solid #c89200;
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 22px;
+    border-radius: 10px;
+    background: orange;
+    border: 3px solid #cc7a00;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 #spinBtn:hover {
-    background: #ffe27a;
     transform: scale(1.05);
+    background: #ffb200;
 }
 
 /* =========================================
-   TASK BOX
+   ZADANIA
 ========================================= */
+
 #taskBox {
-    font-size: 36px;
-    margin-top: 30px;
-    min-height: 60px;
+    margin: 20px auto;
+    padding: 20px;
+    width: 80%;
+    background: #333;
+    border: 3px solid #555;
+    border-radius: 15px;
+    font-size: 26px;
+    min-height: 80px;
+    line-height: 1.5;
 }
 
 /* =========================================
    ODPOWIEDŹ
 ========================================= */
+
 #answerSection {
     margin-top: 20px;
 }
 
 #answerInput {
-    font-size: 28px;
     padding: 10px;
+    font-size: 22px;
     width: 200px;
-    border-radius: 15px;
-    border: 3px solid #1a4bbb;
+    border-radius: 8px;
+    border: 2px solid #555;
 }
 
 #checkBtn {
-    padding: 15px 30px;
-    font-size: 26px;
-    border-radius: 15px;
-    background: #daffe0;
-    border: 3px solid #00a825;
+    padding: 10px 20px;
+    font-size: 22px;
+    border-radius: 10px;
+    margin-left: 10px;
+    background: #00aa00;
+    border: 2px solid #007700;
     cursor: pointer;
-    transition: 0.2s;
 }
 
 #checkBtn:hover {
-    background: #afffc2;
+    background: #00cc00;
 }
 
 /* =========================================
-   TABLICA WYNIKÓW
+   ŻYCIA
 ========================================= */
-#scoreBoard {
-    margin-top: 40px;
-    font-size: 26px;
+
+#lifePanel {
+    font-size: 32px;
+    margin: 15px;
 }
 
 /* =========================================
    TIMER
 ========================================= */
+
 #timer {
     font-size: 40px;
-    margin: 20px;
-    color: #ff0000;
-    font-weight: bold;
+    color: #ff4444;
+    margin-bottom: 10px;
 }
 
 /* =========================================
-   TELETURNIEJ – KOŁA RATUNKOWE
+   TABLICE WYNIKÓW
 ========================================= */
-.lifeBtn {
-    padding: 20px 35px;
-    margin: 10px;
-    font-size: 30px;
-    border-radius: 20px;
-    background: #fff8d1;
-    border: 3px solid #b39b00;
-    cursor: pointer;
-    transition: 0.2s;
-}
 
-.lifeBtn:hover {
-    background: #ffee9b;
-}
-
-.lifeBtn.used {
-    background: #d6d6d6;
-    border-color: #666;
-    cursor: not-allowed;
+#scoreBoard {
+    width: 400px;
 }
 
 /* =========================================
-   TELETURNIEJ – ODPOWIEDZI ABC
+   TELETURNIEJ
 ========================================= */
+
 #quizAnswers button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 28px;
-    border-radius: 15px;
-    border: 3px solid #0033aa;
-    background: #e7efff;
+    width: 350px;
 }
 
-#quizAnswers button:hover {
-    background: #cbdcff;
+#quizPlayersBoard {
+    font-size: 22px;
+    margin-top: 15px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   ANIMACJE
+========================================= */
+
+@keyframes glow {
+    0% { box-shadow: 0 0 5px yellow; }
+    50% { box-shadow: 0 0 25px yellow; }
+    100% { box-shadow: 0 0 5px yellow; }
+}
+
+#spinBtn.glow {
+    animation: glow 1.2s infinite;
 }
