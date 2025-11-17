@@ -837,6 +837,112 @@ const quizQuestions = [
 { q: "Co trzeba czasem restartować?", a: "Komputer", w1: "Zeszyt", w2: "Monitor" },
 { q: "Co może mieć wirusa?", a: "Komputer", w1: "Buty", w2: "Piórnik" }
 ];
+const mathQuiz = [
+
+/* =============================
+   🔢 DODAWANIE DO 10
+============================= */
+{ q: "Ile to 2 + 2?", a: "4", w1: "3", w2: "5" },
+{ q: "Ile to 3 + 1?", a: "4", w1: "5", w2: "2" },
+{ q: "Ile to 5 + 4?", a: "9", w1: "8", w2: "7" },
+{ q: "Ile to 1 + 6?", a: "7", w1: "6", w2: "8" },
+{ q: "Ile to 4 + 3?", a: "7", w1: "6", w2: "8" },
+{ q: "Ile to 3 + 5?", a: "8", w1: "9", w2: "7" },
+{ q: "Ile to 7 + 2?", a: "9", w1: "8", w2: "10" },
+{ q: "Ile to 6 + 1?", a: "7", w1: "8", w2: "5" },
+{ q: "Ile to 8 + 1?", a: "9", w1: "10", w2: "7" },
+{ q: "Ile to 5 + 2?", a: "7", w1: "6", w2: "8" },
+
+/* =============================
+   ➖ ODEJMOWANIE DO 10
+============================= */
+{ q: "Ile to 5 - 3?", a: "2", w1: "3", w2: "1" },
+{ q: "Ile to 7 - 2?", a: "5", w1: "6", w2: "4" },
+{ q: "Ile to 9 - 4?", a: "5", w1: "4", w2: "6" },
+{ q: "Ile to 6 - 1?", a: "5", w1: "4", w2: "3" },
+{ q: "Ile to 4 - 2?", a: "2", w1: "1", w2: "3" },
+{ q: "Ile to 8 - 3?", a: "5", w1: "6", w2: "4" },
+{ q: "Ile to 10 - 7?", a: "3", w1: "4", w2: "2" },
+{ q: "Ile to 9 - 1?", a: "8", w1: "7", w2: "9" },
+{ q: "Ile to 5 - 4?", a: "1", w1: "0", w2: "2" },
+{ q: "Ile to 7 - 7?", a: "0", w1: "1", w2: "2" },
+
+/* =============================
+   🔢 DODAWANIE DO 20
+============================= */
+{ q: "Ile to 12 + 3?", a: "15", w1: "14", w2: "16" },
+{ q: "Ile to 9 + 7?", a: "16", w1: "15", w2: "18" },
+{ q: "Ile to 11 + 8?", a: "19", w1: "18", w2: "17" },
+{ q: "Ile to 15 + 4?", a: "19", w1: "18", w2: "20" },
+{ q: "Ile to 7 + 12?", a: "19", w1: "17", w2: "20" },
+{ q: "Ile to 10 + 9?", a: "19", w1: "18", w2: "20" },
+{ q: "Ile to 6 + 13?", a: "19", w1: "18", w2: "17" },
+{ q: "Ile to 14 + 2?", a: "16", w1: "17", w2: "15" },
+{ q: "Ile to 8 + 11?", a: "19", w1: "18", w2: "17" },
+{ q: "Ile to 5 + 14?", a: "19", w1: "18", w2: "20" },
+
+/* =============================
+   ➖ ODEJMOWANIE DO 20
+============================= */
+{ q: "Ile to 15 - 5?", a: "10", w1: "9", w2: "11" },
+{ q: "Ile to 19 - 7?", a: "12", w1: "11", w2: "10" },
+{ q: "Ile to 16 - 4?", a: "12", w1: "11", w2: "10" },
+{ q: "Ile to 18 - 9?", a: "9", w1: "8", w2: "10" },
+{ q: "Ile to 14 - 6?", a: "8", w1: "7", w2: "9" },
+{ q: "Ile to 13 - 5?", a: "8", w1: "7", w2: "6" },
+{ q: "Ile to 12 - 3?", a: "9", w1: "8", w2: "7" },
+{ q: "Ile to 17 - 8?", a: "9", w1: "10", w2: "7" },
+{ q: "Ile to 20 - 11?", a: "9", w1: "10", w2: "8" },
+{ q: "Ile to 19 - 14?", a: "5", w1: "4", w2: "6" },
+
+/* =============================
+   ❓ ZADANIA TEKSTOWE ABC
+============================= */
+{ q: "Ala miała 3 jabłka i dostała 2. Ile ma teraz?", a: "5", w1: "4", w2: "6" },
+{ q: "Kuba miał 5 cukierków i zjadł 2. Ile zostało?", a: "3", w1: "2", w2: "4" },
+{ q: "Ola miała 10 zł i wydała 4 zł. Ile ma?", a: "6", w1: "5", w2: "4" },
+{ q: "Marek zebrał 7 liści, a Zosia dała mu 3. Ile ma razem?", a: "10", w1: "9", w2: "8" },
+{ q: "Tomek miał 12 klocków, oddał 5. Ile zostało?", a: "7", w1: "6", w2: "8" },
+{ q: "Basia miała 4 balony i dostała 6. Ile ma?", a: "10", w1: "8", w2: "9" },
+{ q: "Igor miał 9 cukierków i oddał 4. Ile zostało?", a: "5", w1: "4", w2: "6" },
+{ q: "Kamil zjadł 2 z 8 ciastek. Ile zostało?", a: "6", w1: "5", w2: "7" },
+{ q: "Asia miała 3 kredki i dostała 7. Ile ma?", a: "10", w1: "9", w2: "8" },
+{ q: "Ania miała 15 zł i kupiła lizaka za 3 zł. Ile zostało?", a: "12", w1: "11", w2: "13" },
+
+/* =============================
+   🔢 LICZBY I PORÓWNANIA
+============================= */
+{ q: "Która liczba jest większa?", a: "9", w1: "7", w2: "5" },
+{ q: "Która liczba jest mniejsza?", a: "2", w1: "8", w2: "5" },
+{ q: "Która liczba jest największa?", a: "10", w1: "8", w2: "9" },
+{ q: "Która liczba jest najmniejsza?", a: "1", w1: "3", w2: "2" },
+{ q: "7 jest…", a: "większe od 5", w1: "mniejsze od 5", w2: "równe 5" },
+{ q: "3 jest…", a: "mniejsze od 8", w1: "większe od 8", w2: "równe 8" },
+
+/* =============================
+   🕒 ZEGAR (PROSTE)
+============================= */
+{ q: "Jeśli jest 3:00, to która to godzina?", a: "Trzecia", w1: "Siódma", w2: "Dziesiąta" },
+{ q: "Jeśli jest 7:00, to która to godzina?", a: "Siódma", w1: "Dziewiąta", w2: "Czwarta" },
+{ q: "Jeśli jest 12:00, to która to godzina?", a: "Dwunasta", w1: "Trzecia", w2: "Szósta" },
+
+/* =============================
+   🔢 LICZENIE DO 100
+============================= */
+{ q: "Ile to 50 + 20?", a: "70", w1: "60", w2: "80" },
+{ q: "Ile to 90 - 30?", a: "60", w1: "70", w2: "50" },
+{ q: "Ile to 40 + 40?", a: "80", w1: "90", w2: "70" },
+{ q: "Ile to 30 + 20?", a: "50", w1: "40", w2: "60" },
+{ q: "Ile to 70 - 10?", a: "60", w1: "50", w2: "70" },
+
+/* =============================
+   ✔ LICZENIE OBIEKTÓW
+============================= */
+{ q: "Na obrazku jest 5 jabłek. Dodamy 3. Ile razem?", a: "8", w1: "7", w2: "9" },
+{ q: "Masz 4 kredki, dostajesz 4. Ile masz?", a: "8", w1: "7", w2: "6" },
+{ q: "Z 10 cukierków zjadasz 2. Ile zostało?", a: "8", w1: "7", w2: "9" }
+
+];
 
 
 /* ============================================================
