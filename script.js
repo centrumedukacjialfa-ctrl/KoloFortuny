@@ -1,196 +1,169 @@
-/* ============================================
-   USTAWIENIA GLOBALNE
-============================================ */
+// =========================
+// KOŁO – konfiguracja
+// =========================
 
-let correctAnswer = 0;
-let currentPlayer = 1;
-let scores = { p1: 0, p2: 0 };
-let timer;
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
 
-// Punkty zależne od koloru
-let segmentPoints = {
-    blue: 1,
-    green: 2,
-    yellow: 3,
-    red: 5
-};
+let angle = 0;
+let spinning = false;
 
-let chosenSegmentColor = null;
+const segments = [
+    { color: "blue", points: 1 },
+    { color: "green", points: 2 },
+    { color: "yellow", points: 3 },
+    { color: "red", points: 5 },
+    { color: "blue", points: 1 },
+    { color: "green", points: 2 },
+    { color: "yellow", points: 3 },
+    { color: "red", points: 5 }
+];
 
-/* ============================================
-   USTAWIENIA NAUCZYCIELA
-============================================ */
+const segmentAngle = (2 * Math.PI) / segments.length;
 
-let settings = {
-    difficulty: "easy",
-    taskType: "mix",
-    gameMode: "single"
-};
+// =========================
+// RYSOWANIE KOŁA
+// =========================
 
-document.getElementById("saveSettings").addEventListener("click", () => {
-    settings.difficulty = document.getElementById("difficulty").value;
-    settings.taskType = document.getElementById("taskType").value;
-    settings.gameMode = document.getElementById("gameMode").value;
+function drawWheel() {
+    for (let i = 0; i < segments.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 250, i * segmentAngle, (i + 1) * segmentAngle);
+        ctx.fillStyle = segments[i].color;
+        ctx.fill();
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 4;
+        ctx.stroke();
 
-    alert("Ustawienia zapisane!");
+        // Tekst punktów
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(i * segmentAngle + segmentAngle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "black";
+        ctx.font = "bold 30px Arial";
+        ctx.fillText(`${segments[i].points} pkt`, 230, 10);
+        ctx.restore();
+    }
+}
+
+drawWheel();
+
+// =========================
+// LOSOWE KRĘCENIE
+// =========================
+
+spinBtn.addEventListener("click", () => {
+    if (spinning) return;
+    spinning = true;
+
+    const randomSpin = Math.random() * 4 + 4; // 4–8 obrotów
+    const spinTime = 3000;
+    const startTime = performance.now();
+
+    function animateWheel(time) {
+        const progress = (time - startTime) / spinTime;
+
+        if (progress < 1) {
+            angle = randomSpin * Math.PI * 2 * (1 - Math.pow(1 - progress, 3));
+            drawRotatedWheel();
+            requestAnimationFrame(animateWheel);
+        } else {
+            spinning = false;
+            finalizeSpin();
+        }
+    }
+
+    requestAnimationFrame(animateWheel);
 });
 
-/* ============================================
-   FUNKCJE POMOCNICZE
-============================================ */
-
-function getNumber() {
-    if (settings.difficulty === "easy") return Math.floor(Math.random() * 10) + 1;
-    if (settings.difficulty === "medium") return Math.floor(Math.random() * 20) + 1;
-    if (settings.difficulty === "hard") return Math.floor(Math.random() * 50) + 1;
+function drawRotatedWheel() {
+    ctx.save();
+    ctx.translate(250, 250);
+    ctx.rotate(angle);
+    ctx.translate(-250, -250);
+    ctx.clearRect(0, 0, 500, 500);
+    drawWheel();
+    ctx.restore();
 }
 
-function generateTask() {
-    let a = getNumber();
-    let b = getNumber();
+// =========================
+// USTALANIE SEGMENTU
+// =========================
 
-    let type = settings.taskType;
-    if (type === "mix") type = Math.random() < 0.5 ? "add" : "sub";
+let chosenSegment = null;
 
-    if (type === "add") {
-        correctAnswer = a + b;
-        return `${a} + ${b} = ?`;
-    }
+function finalizeSpin() {
+    const normalizedAngle = (angle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    const winningIndex = segments.length - 1 - Math.floor(normalizedAngle / segmentAngle);
+    chosenSegment = segments[winningIndex];
 
-    if (type === "sub") {
-        let big = Math.max(a, b);
-        let small = Math.min(a, b);
-        correctAnswer = big - small;
-        return `${big} - ${small} = ?`;
-    }
+    document.getElementById("taskBox").innerHTML =
+        "<b>Kliknij koło, aby zobaczyć zadanie!</b>";
 }
 
-/* ============================================
-   KRĘCENIE KOŁEM
-============================================ */
-
-function spinWheel() {
-    chosenSegmentColor = null;
-    document.getElementById("taskBox").innerHTML = "";
-    document.getElementById("result").innerHTML = "";
-    document.getElementById("answerSection").style.display = "none";
-
-    const wheel = document.getElementById("wheel");
-    const randomSpin = 720 + Math.floor(Math.random() * 1080);
-
-    wheel.style.transform = `rotate(${randomSpin}deg)`;
-
-    setTimeout(() => {
-        document.getElementById("taskBox").innerHTML =
-            "<b>Kliknij w segment koła, aby zobaczyć zadanie!</b>";
-    }, 4000);
-}
-
-/* ============================================
-   KLIKNIĘCIE SEGMENTU → WYBÓR KOLORU
-============================================ */
-
-document.getElementById("wheel").addEventListener("click", () => {
-    if (!document.getElementById("taskBox").innerHTML.includes("Kliknij")) return;
-
-    let colors = ["blue", "green", "yellow", "red"];
-    chosenSegmentColor = colors[Math.floor(Math.random() * 4)];
+canvas.addEventListener("click", () => {
+    if (!chosenSegment) return;
 
     showTask();
 });
 
-/* ============================================
-   POKAZANIE ZADANIA + PUNKTY ZA SEGMENT
-============================================ */
+// =========================
+// GENEROWANIE ZADAŃ
+// =========================
+
+function randomNumber() {
+    return Math.floor(Math.random() * 10) + 1;
+}
 
 function showTask() {
-    let task = generateTask();
-    let points = segmentPoints[chosenSegmentColor];
+    const a = randomNumber();
+    const b = randomNumber();
+    const add = Math.random() < 0.5;
+
+    correctAnswer = add ? a + b : a - b;
+
+    const symbol = add ? "+" : "-";
 
     document.getElementById("taskBox").innerHTML =
-        `<b>${task}</b><br><br>Punkty za to zadanie: <b>${points}</b>`;
+        `<b>${a} ${symbol} ${b} = ?</b><br><br>
+         Za to zadanie możesz zdobyć <b>${chosenSegment.points}</b> punktów!`;
 
     document.getElementById("answerSection").style.display = "block";
 }
 
-/* ============================================
-   SPRAWDZANIE ODPOWIEDZI
-============================================ */
+// =========================
+// SPRAWDZANIE ODPOWIEDZI
+// =========================
 
-function checkAnswer() {
-    let userAns = Number(document.getElementById("answer").value);
-    let result = document.getElementById("result");
+let correctAnswer = 0;
+let playerTurn = 1;
+let scores = { p1: 0, p2: 0 };
 
-    if (userAns === correctAnswer) {
-        let points = segmentPoints[chosenSegmentColor];
-        result.style.color = "green";
-        result.innerHTML = `✔ Poprawnie! Zdobywasz <b>${points}</b> punkt(y)!`;
-        givePoints(points);
+document.getElementById("checkBtn").addEventListener("click", () => {
+    const answer = Number(document.getElementById("answerInput").value);
+
+    if (answer === correctAnswer) {
+        document.getElementById("result").innerHTML =
+            `✔ Poprawnie! Zdobywasz <b>${chosenSegment.points}</b> pkt!`;
+
+        if (playerTurn === 1) scores.p1 += chosenSegment.points;
+        else scores.p2 += chosenSegment.points;
+
+        playerTurn = playerTurn === 1 ? 2 : 1;
+
     } else {
-        result.style.color = "red";
-        result.innerHTML = `✘ Błąd! Poprawna odpowiedź: <b>${correctAnswer}</b>`;
-    }
-}
-
-/* ============================================
-   SYSTEM PUNKTÓW
-============================================ */
-
-function givePoints(points) {
-    if (settings.gameMode === "vs" || settings.gameMode === "to5") {
-        if (currentPlayer === 1) {
-            scores.p1 += points;
-            currentPlayer = 2;
-        } else {
-            scores.p2 += points;
-            currentPlayer = 1;
-        }
-    } else {
-        scores.p1 += points;
+        document.getElementById("result").innerHTML =
+            `✘ Błąd! Poprawna odpowiedź to: <b>${correctAnswer}</b>`;
     }
 
     updateScoreboard();
-
-    if (settings.gameMode === "to5") {
-        if (scores.p1 >= 5) alert("🏆 Gracz 1 wygrał!");
-        if (scores.p2 >= 5) alert("🏆 Gracz 2 wygrał!");
-    }
-}
+    chosenSegment = null;
+});
 
 function updateScoreboard() {
     document.getElementById("p1").innerText = scores.p1;
     document.getElementById("p2").innerText = scores.p2;
-}
-
-/* ============================================
-   TRYB ĆWICZEŃ
-============================================ */
-
-document.getElementById("exerciseBtn").addEventListener("click", () => {
-    document.getElementById("exercisePanel").style.display = "block";
-    newExercise();
-});
-
-function newExercise() {
-    let task = generateTask();
-    document.getElementById("exerciseTask").innerHTML = task;
-}
-
-function checkExercise() {
-    let ans = Number(document.getElementById("exerciseAnswer").value);
-    let box = document.getElementById("exerciseResult");
-
-    if (ans === correctAnswer) {
-        box.style.color = "green";
-        box.innerHTML = "✔ Dobrze!";
-    } else {
-        box.style.color = "red";
-        box.innerHTML = `✘ Źle – poprawna odpowiedź: ${correctAnswer}`;
-    }
-
-    setTimeout(() => {
-        box.innerHTML = "";
-        document.getElementById("exerciseAnswer").value = "";
-        newExercise();
-    }, 2000);
 }
