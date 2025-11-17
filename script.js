@@ -765,19 +765,79 @@ function startQuizTournamentGame() {
 /* ============================================================
    🧩 PYTANIA ABC (INFORMATYKA)
 ============================================================ */
-
+/* ============================================================
+   🧩 PYTANIA ABC (INFORMATYKA – 180+ pytań)
+============================================================ */
 const quizQuestions = [
-    { q: "Co służy do pisania?", a: "Klawiatura", w1: "Mysz", w2: "Monitor" },
-    { q: "Co wyświetla obraz?", a: "Monitor", w1: "Głośniki", w2: "Mysz" },
-    { q: "Co służy do słuchania?", a: "Głośniki", w1: "Monitor", w2: "Drukarka" },
-    { q: "Co nagrywa obraz?", a: "Kamera", w1: "Mikrofon", w2: "Klawiatura" },
-    { q: "Co łączy komputer z Internetem?", a: "Router", w1: "Klawiatura", w2: "Pendrive" },
-    { q: "Co służy do rysowania?", a: "Paint", w1: "Word", w2: "Excel" },
-    { q: "Co służy do pisania dokumentów?", a: "Edytor tekstu", w1: "Paint", w2: "Kalkulator" },
-    { q: "Hasła powinno się…", a: "Chronić", w1: "Udostępniać", w2: "Pisać na monitorze" },
-    { q: "Co to spam?", a: "Niechciana poczta", w1: "Program antywirusowy", w2: "Plik muzyczny" },
-    { q: "Bezpieczna strona zaczyna się od…", a: "HTTPS", w1: "HTTP", w2: "WWW" }
+
+/* === SPRZĘT KOMPUTEROWY === */
+{ q: "Co wyświetla obraz?", a: "Monitor", w1: "Mysz", w2: "Głośnik" },
+{ q: "Co służy do wpisywania tekstu?", a: "Klawiatura", w1: "Mysz", w2: "Router" },
+{ q: "Czym przesuwamy kursor?", a: "Mysz", w1: "Kamera", w2: "Głośniki" },
+{ q: "Co drukuje dokumenty?", a: "Drukarka", w1: "Monitor", w2: "Pendrive" },
+{ q: "Co nagrywa głos?", a: "Mikrofon", w1: "Głośniki", w2: "Kamera" },
+{ q: "Gdzie są głośniki?", a: "Po bokach monitora", w1: "W kablach", w2: "W koszu" },
+{ q: "Co przechowuje dane?", a: "Dysk", w1: "Monitor", w2: "Głośnik" },
+{ q: "Laptop to komputer…", a: "Przenośny", w1: "Stacjonarny", w2: "Do gier retro" },
+{ q: "Komputer na biurku to…", a: "Stacjonarny", w1: "Telefon", w2: "Smartwatch" },
+{ q: "Co łączy komputer z prądem?", a: "Zasilacz", w1: "Router", w2: "Głośnik" },
+
+/* === PLIKI, FOLDERY, SYSTEM === */
+{ q: "Co usuwa pliki?", a: "Kosz", w1: "Router", w2: "Paint" },
+{ q: "Pliki zapisujemy w…", a: "Folderach", w1: "Tapecie", w2: "YouTube" },
+{ q: "Co robi CTRL+C?", a: "Kopiuje", w1: "Usuwa", w2: "Drukuje" },
+{ q: "Co robi CTRL+V?", a: "Wkleja", w1: "Zamyka", w2: "Wyłącza komputer" },
+{ q: "Co robi CTRL+S?", a: "Zapisuje", w1: "Maluję", w2: "Wycina" },
+{ q: "Ikony znajdują się na…", a: "Pulpicie", w1: "YouTube", w2: "Koszu" },
+{ q: "Folder to…", a: "Miejsce na pliki", w1: "Program", w2: "Obrazek" },
+{ q: "Usunięte pliki trafiają do…", a: "Kosza", w1: "Internetu", w2: "Kalkulatora" },
+
+/* === INTERNET === */
+{ q: "Do czego służy przeglądarka?", a: "Do internetu", w1: "Do pisania", w2: "Do filmów offline" },
+{ q: "Co to Google?", a: "Wyszukiwarka", w1: "Gra", w2: "Program antywirusowy" },
+{ q: "Strona z filmami to…", a: "YouTube", w1: "Word", w2: "Paint" },
+{ q: "Bezpieczna strona zaczyna się od…", a: "https://", w1: "http://", w2: "www." },
+{ q: "Co zapewnia dostęp do internetu?", a: "Router", w1: "Mysz", w2: "Drukarka" },
+{ q: "E-mail to…", a: "Poczta elektroniczna", w1: "Folder", w2: "Gra" },
+{ q: "Adres wpisujemy w…", a: "Pasku adresu", w1: "Koszu", w2: "Excelu" },
+{ q: "Link to…", a: "Odnośnik", w1: "Tapeta", w2: "Plik muzyczny" },
+
+/* === BEZPIECZEŃSTWO W SIECI === */
+{ q: "Hasło powinno być…", a: "Tajne", w1: "Udostępniane", w2: "Krótkie" },
+{ q: "Czy podajemy hasło obcym?", a: "Nie", w1: "Tak", w2: "Tylko czasem" },
+{ q: "Ikona kłódki oznacza…", a: "Bezpieczną stronę", w1: "Błąd", w2: "Reklamę" },
+{ q: "Co chroni komputer?", a: "Antywirus", w1: "Paint", w2: "Word" },
+{ q: "Co to wirus?", a: "Szkodliwy program", w1: "Zdjęcie", w2: "Gra" },
+{ q: "Podejrzany link należy…", a: "Ignorować", w1: "Kliknąć", w2: "Wysłać dalej" },
+{ q: "Silne hasło ma…", a: "Cyfry i litery", w1: "Jedną literę", w2: "1234" },
+{ q: "Co to phishing?", a: "Oszustwo", w1: "Zdjęcie", w2: "Program" },
+
+/* === PROGRAMY === */
+{ q: "Program do pisania to…", a: "Word", w1: "Paint", w2: "Galeria" },
+{ q: "Program do rysowania to…", a: "Paint", w1: "Excel", w2: "YouTube" },
+{ q: "Do prezentacji używamy…", a: "PowerPoint", w1: "Word", w2: "Kalkulator" },
+{ q: "Do obliczeń używamy…", a: "Kalkulatora", w1: "Kamyka", w2: "Drukarki" },
+{ q: "Excel służy do…", a: "Tabel", w1: "Filmów", w2: "Nagrywania dźwięku" },
+
+/* === SMARTFON / TABLET === */
+{ q: "Mały komputer to…", a: "Smartfon", w1: "Router", w2: "Monitor" },
+{ q: "Do robienia zdjęć służy…", a: "Aparat", w1: "Głośnik", w2: "Pendrive" },
+{ q: "Do rozmów służy…", a: "Telefon", w1: "Router", w2: "Mysz" },
+
+/* === ŁATWE / DLA SZKOŁY SPECJALNEJ === */
+{ q: "Tapeta to…", a: "Tło pulpitu", w1: "Program", w2: "Folder" },
+{ q: "Ikona to…", a: "Mały obrazek", w1: "Hasło", w2: "Router" },
+{ q: "Pulpit to…", a: "Ekran główny", w1: "Internet", w2: "Kosz" },
+{ q: "Menu Start służy do…", a: "Uruchamiania programów", w1: "Rysowania", w2: "Wyłączania głośników" },
+
+/* === TRUDNIEJSZE – LOGIKA KOMPUTERA === */
+{ q: "CPU to…", a: "Procesor", w1: "Głośnik", w2: "Drukarka" },
+{ q: "GPU to…", a: "Karta graficzna", w1: "Mysz", w2: "Kamera" },
+{ q: "Co chłodzi komputer?", a: "Wentylator", w1: "Mysz", w2: "Router" },
+{ q: "Co trzeba czasem restartować?", a: "Komputer", w1: "Zeszyt", w2: "Monitor" },
+{ q: "Co może mieć wirusa?", a: "Komputer", w1: "Buty", w2: "Piórnik" }
 ];
+
 
 /* ============================================================
    🎤 GENEROWANIE PYTANIA ABC
