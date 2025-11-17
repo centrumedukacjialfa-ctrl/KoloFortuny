@@ -1,10 +1,13 @@
 // =========================
-// KOŁO – konfiguracja
+// KOŁO 8 SEGMENTÓW
 // =========================
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
+
 const spinBtn = document.getElementById("spinBtn");
+const answerSection = document.getElementById("answerSection");
+const answerInput = document.getElementById("answerInput");
 
 let angle = 0;
 let spinning = false;
@@ -20,11 +23,7 @@ const segments = [
     { color: "red", points: 5 }
 ];
 
-const segmentAngle = (2 * Math.PI) / segments.length;
-
-// =========================
-// RYSOWANIE KOŁA
-// =========================
+const segmentAngle = (2 * Math.PI) / 8;
 
 function drawWheel() {
     for (let i = 0; i < segments.length; i++) {
@@ -34,52 +33,57 @@ function drawWheel() {
         ctx.fillStyle = segments[i].color;
         ctx.fill();
         ctx.strokeStyle = "black";
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Tekst punktów
         ctx.save();
         ctx.translate(250, 250);
         ctx.rotate(i * segmentAngle + segmentAngle / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "black";
-        ctx.font = "bold 30px Arial";
-        ctx.fillText(`${segments[i].points} pkt`, 230, 10);
+        ctx.font = "bold 26px Arial";
+        ctx.fillText(`${segments[i].points} pkt`, 220, 10);
         ctx.restore();
     }
 }
 
 drawWheel();
 
-// =========================
-// LOSOWE KRĘCENIE
-// =========================
+// ==============================
+// SPIN
+// ==============================
 
 spinBtn.addEventListener("click", () => {
     if (spinning) return;
+
+    document.getElementById("taskBox").innerHTML = "";
+    document.getElementById("result").innerHTML = "";
+    answerSection.style.display = "none";
+    answerInput.value = "";
+
     spinning = true;
 
-    const randomSpin = Math.random() * 4 + 4; // 4–8 obrotów
+    const randomSpin = Math.random() * 4 + 4;
     const spinTime = 3000;
     const startTime = performance.now();
 
-    function animateWheel(time) {
+    function animate(time) {
         const progress = (time - startTime) / spinTime;
 
         if (progress < 1) {
             angle = randomSpin * Math.PI * 2 * (1 - Math.pow(1 - progress, 3));
-            drawRotatedWheel();
-            requestAnimationFrame(animateWheel);
+            drawRotated();
+            requestAnimationFrame(animate);
         } else {
             spinning = false;
-            finalizeSpin();
+            finishSpin();
         }
     }
 
-    requestAnimationFrame(animateWheel);
+    requestAnimationFrame(animate);
 });
 
-function drawRotatedWheel() {
+function drawRotated() {
     ctx.save();
     ctx.translate(250, 250);
     ctx.rotate(angle);
@@ -89,16 +93,12 @@ function drawRotatedWheel() {
     ctx.restore();
 }
 
-// =========================
-// USTALANIE SEGMENTU
-// =========================
-
 let chosenSegment = null;
 
-function finalizeSpin() {
+function finishSpin() {
     const normalizedAngle = (angle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    const winningIndex = segments.length - 1 - Math.floor(normalizedAngle / segmentAngle);
-    chosenSegment = segments[winningIndex];
+    const index = segments.length - 1 - Math.floor(normalizedAngle / segmentAngle);
+    chosenSegment = segments[index];
 
     document.getElementById("taskBox").innerHTML =
         "<b>Kliknij koło, aby zobaczyć zadanie!</b>";
@@ -106,47 +106,117 @@ function finalizeSpin() {
 
 canvas.addEventListener("click", () => {
     if (!chosenSegment) return;
-
     showTask();
 });
 
-// =========================
+// ==============================
 // GENEROWANIE ZADAŃ
-// =========================
+// ==============================
 
-function randomNumber() {
+let correctAnswer = "";
+let expectedSymbol = "";
+let expectedMissing = null;
+
+function randomNum() {
     return Math.floor(Math.random() * 10) + 1;
 }
 
-function showTask() {
-    const a = randomNumber();
-    const b = randomNumber();
-    const add = Math.random() < 0.5;
+const dotColors = ["🔵", "🟢", "🟡", "🔴"];
 
-    correctAnswer = add ? a + b : a - b;
-
-    const symbol = add ? "+" : "-";
-
-    document.getElementById("taskBox").innerHTML =
-        `<b>${a} ${symbol} ${b} = ?</b><br><br>
-         Za to zadanie możesz zdobyć <b>${chosenSegment.points}</b> punktów!`;
-
-    document.getElementById("answerSection").style.display = "block";
+function makeDots(n) {
+    let s = "";
+    for (let i = 0; i < n; i++) s += dotColors[Math.floor(Math.random() * 4)];
+    return s;
 }
 
-// =========================
-// SPRAWDZANIE ODPOWIEDZI
-// =========================
+function generateStory() {
+    const a = randomNum(), b = randomNum();
+    const add = Math.random() < 0.5;
 
-let correctAnswer = 0;
-let playerTurn = 1;
+    if (add) {
+        correctAnswer = a + b;
+        return `Kuba miał ${a} klocków. Mama dała mu ${b}. Ile ma teraz razem?`;
+    } else {
+        const big = Math.max(a, b);
+        const small = Math.min(a, b);
+        correctAnswer = big - small;
+        return `Ala miała ${big} cukierki. Dała koledze ${small}. Ile jej zostało?`;
+    }
+}
+
+function generateMissing() {
+    const a = randomNum(), b = randomNum();
+    const res = a + b;
+    correctAnswer = a;
+
+    return `__ + ${b} = ${res}`;
+}
+
+function generateCompare() {
+    const a = randomNum(), b = randomNum();
+    correctAnswer = a === b ? "=" : a > b ? ">" : "<";
+    return `${a} ? ${b}`;
+}
+
+function showTask() {
+    const style = document.getElementById("taskStyleSelect").value;
+
+    answerSection.style.display = "block";
+
+    let task = "";
+    if (style === "mix") {
+        const types = ["classic", "dots", "story", "missing", "compare"];
+        return showTaskOfType(types[Math.floor(Math.random() * 5)]);
+    } else {
+        return showTaskOfType(style);
+    }
+}
+
+function showTaskOfType(type) {
+    let task = "";
+
+    if (type === "classic") {
+        const a = randomNum(), b = randomNum();
+        const add = Math.random() < 0.5;
+        correctAnswer = add ? a + b : a - b;
+        task = `${a} ${add ? "+" : "-"} ${b} = ?`;
+
+    } else if (type === "dots") {
+        const a = randomNum(), b = randomNum();
+        const add = Math.random() < 0.5;
+        correctAnswer = add ? a + b : a - b;
+        task = `${makeDots(a)} ${add ? "+" : "-"} ${makeDots(b)} = ?`;
+
+    } else if (type === "story") {
+        task = generateStory();
+
+    } else if (type === "missing") {
+        task = generateMissing();
+
+    } else if (type === "compare") {
+        task = generateCompare();
+    }
+
+    document.getElementById("taskBox").innerHTML =
+        `<b>${task}</b><br><br>
+         Za to zadanie: <b>${chosenSegment.points}</b> pkt`;
+}
+
+
+// ==============================
+// SPRAWDZANIE ODPOWIEDZI
+// ==============================
+
 let scores = { p1: 0, p2: 0 };
+let playerTurn = 1;
 
 document.getElementById("checkBtn").addEventListener("click", () => {
-    const answer = Number(document.getElementById("answerInput").value);
+    const user = answerInput.value.trim();
+    const resultBox = document.getElementById("result");
 
-    if (answer === correctAnswer) {
-        document.getElementById("result").innerHTML =
+    if (user == correctAnswer) {
+        resultBox.style.color = "green";
+        resultBox.innerHTML =
             `✔ Poprawnie! Zdobywasz <b>${chosenSegment.points}</b> pkt!`;
 
         if (playerTurn === 1) scores.p1 += chosenSegment.points;
@@ -155,8 +225,8 @@ document.getElementById("checkBtn").addEventListener("click", () => {
         playerTurn = playerTurn === 1 ? 2 : 1;
 
     } else {
-        document.getElementById("result").innerHTML =
-            `✘ Błąd! Poprawna odpowiedź to: <b>${correctAnswer}</b>`;
+        resultBox.style.color = "red";
+        resultBox.innerHTML = `✘ Źle! Poprawna odpowiedź: <b>${correctAnswer}</b>`;
     }
 
     updateScoreboard();
